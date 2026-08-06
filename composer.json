@@ -8,10 +8,12 @@
     "require": {
         "php": "^8.3",
         "filament/filament": "4.12.5",
+        "filament/spatie-laravel-media-library-plugin": "^4.12",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
         "phpoffice/phpspreadsheet": "^5.9",
         "spatie/laravel-activitylog": "^4.12",
+        "spatie/laravel-medialibrary": "^11.23",
         "spatie/laravel-permission": "^8.3"
     },
     "require-dev": {

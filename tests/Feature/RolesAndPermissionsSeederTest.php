@@ -18,14 +18,15 @@ class RolesAndPermissionsSeederTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->assertDatabaseCount('roles', 6);
-        $this->assertDatabaseCount('permissions', 12);
+        $this->assertDatabaseCount('permissions', 17);
 
         $superAdmin = Role::findByName('super_admin');
-        $this->assertCount(12, $superAdmin->permissions);
+        $this->assertCount(17, $superAdmin->permissions);
 
         $doctor = Role::findByName('doctor');
         $this->assertTrue($doctor->hasPermissionTo('consultations.manage'));
         $this->assertFalse($doctor->hasPermissionTo('billing.manage'));
+        $this->assertTrue($doctor->hasPermissionTo('doctors.view'));
 
         $this->assertTrue(Permission::findByName('users.view')->exists);
     }

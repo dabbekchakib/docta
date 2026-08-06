@@ -9,6 +9,7 @@ use App\Enums\PatientStatus;
 use App\Enums\PatientTitle;
 use App\Enums\RelationType;
 use App\Models\Patient;
+use Database\Factories\Concerns\UsesTunisianNames;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,40 +17,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PatientFactory extends Factory
 {
+    use UsesTunisianNames;
+
     protected $model = Patient::class;
-
-    /**
-     * @var array<int, string>
-     */
-    protected array $maleFirstNames = [
-        'Ahmed', 'Mohamed', 'Ali', 'Hédi', 'Karim', 'Sofien', 'Nabil', 'Youssef', 'Sami',
-        'Anis', 'Walid', 'Rachid', 'Moncef', 'Taoufik', 'Slim', 'Zied', 'Mehdi', 'Fares',
-        'Omar', 'Skander', 'Majdi', 'Hatem', 'Kamel', 'Lassaad', 'Amine', 'Bilel', 'Riadh',
-        'Tarek', 'Mourad', 'Chokri', 'Adel', 'Fathi', 'Hammadi', 'Jamel', 'Lotfi',
-    ];
-
-    /**
-     * @var array<int, string>
-     */
-    protected array $femaleFirstNames = [
-        'Aïcha', 'Fatma', 'Salma', 'Imen', 'Rania', 'Amira', 'Nour', 'Yasmine', 'Sonia',
-        'Rym', 'Leila', 'Souad', 'Meriem', 'Asma', 'Hela', 'Mariem', 'Sabrine', 'Chaima',
-        'Emna', 'Mouna', 'Donia', 'Ines', 'Olfa', 'Sarra', 'Houda', 'Nesrine', 'Wiem',
-        'Rim', 'Samia', 'Monia', 'Zaineb', 'Amani', 'Dorra', 'Khaoula', 'Bessem',
-    ];
-
-    /**
-     * @var array<int, string>
-     */
-    protected array $lastNames = [
-        'Trabelsi', 'Ben Ali', 'Bouazizi', 'Gharbi', 'Jebali', 'Mansour', 'Khelifi', 'Saidi',
-        'Hamdi', 'Ayari', 'Ben Salah', 'Chaabane', 'Dridi', 'Fakhfakh', 'Ghanem', 'Hassine',
-        'Jelloul', 'Kacem', 'Marzouki', 'Naceur', 'Oueslati', 'Rahali', 'Slimani', 'Toumi',
-        'Zribi', 'Ben Amor', 'Cherif', 'Daoud', 'El Fekih', 'Hammami', 'Bouzid', 'Mejri',
-        'Nasri', 'Riahi', 'Sassi', 'Tlili', 'Ammar', 'Belhadj', 'Boussetta', 'Chikhaoui',
-        'Driss', 'Frikha', 'Guedira', 'Hamrouni', 'Karkeni', 'Laroussi', 'Mezghanni', 'Najjar',
-        'Ouali', 'Saadaoui', 'Triki', 'Baccouche', 'Chebbi', 'Douiri', 'Gaaloul', 'Harbaoui',
-    ];
 
     /**
      * @return array<string, mixed>
@@ -58,8 +28,8 @@ class PatientFactory extends Factory
     {
         $gender = $this->faker->randomElement([PatientGender::Male, PatientGender::Female]);
         $firstName = $gender === PatientGender::Male
-            ? $this->faker->randomElement($this->maleFirstNames)
-            : $this->faker->randomElement($this->femaleFirstNames);
+            ? $this->randomMaleFirstName()
+            : $this->randomFemaleFirstName();
 
         $birthDate = $this->faker->dateTimeBetween('-85 years', '-18 years');
         $governorate = $this->faker->randomElement(Governorate::cases());
@@ -75,7 +45,7 @@ class PatientFactory extends Factory
         return [
             'title' => $this->faker->randomElement([PatientTitle::Mr, PatientTitle::Mrs, PatientTitle::Dr]),
             'first_name' => $firstName,
-            'last_name' => $this->faker->randomElement($this->lastNames),
+            'last_name' => $this->randomLastName(),
             'gender' => $gender,
             'birth_date' => $birthDate->format('Y-m-d'),
             'cin' => $this->faker->unique()->numerify('########'),
@@ -132,26 +102,12 @@ class PatientFactory extends Factory
             'has_insurance' => $hasInsurance,
             'insurance_number' => $hasInsurance ? $this->faker->numerify('#######') : null,
             'insurance_expires_at' => $hasInsurance ? $this->faker->dateTimeBetween('-1 year', '+2 years')->format('Y-m-d') : null,
-            'emergency_contact' => $this->faker->boolean(75) ? $this->faker->randomElement([...$this->maleFirstNames, ...$this->femaleFirstNames]) : null,
+            'emergency_contact' => $this->faker->boolean(75) ? $this->randomFirstName() : null,
             'emergency_relation' => $this->faker->randomElement(RelationType::cases()),
             'emergency_phone' => $this->faker->boolean(75) ? $this->tunisianPhone() : null,
             'emergency_address' => $this->faker->boolean(40) ? $this->faker->address() : null,
             'status' => $status,
             'created_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
         ];
-    }
-
-    /**
-     * Génère un numéro de téléphone mobile tunisien (+216 8 chiffres).
-     */
-    private function tunisianPhone(): string
-    {
-        $prefix = $this->faker->randomElement([
-            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-            50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-            90, 91, 92, 93, 94, 95, 96, 97, 98, 99,
-        ]);
-
-        return '+216'.$prefix.$this->faker->numerify('######');
     }
 }

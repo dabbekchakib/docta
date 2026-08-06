@@ -14,6 +14,12 @@ enum Permission: string
     case PatientsUpdate = 'patients.update';
     case PatientsDelete = 'patients.delete';
 
+    case DoctorsView = 'doctors.view';
+    case DoctorsCreate = 'doctors.create';
+    case DoctorsUpdate = 'doctors.update';
+    case DoctorsDelete = 'doctors.delete';
+    case DoctorsExport = 'doctors.export';
+
     case AppointmentsManage = 'appointments.manage';
 
     case ConsultationsManage = 'consultations.manage';
@@ -33,6 +39,11 @@ enum Permission: string
             self::PatientsCreate => 'Créer des patients',
             self::PatientsUpdate => 'Modifier des patients',
             self::PatientsDelete => 'Supprimer des patients',
+            self::DoctorsView => 'Voir les médecins',
+            self::DoctorsCreate => 'Créer des médecins',
+            self::DoctorsUpdate => 'Modifier des médecins',
+            self::DoctorsDelete => 'Supprimer des médecins',
+            self::DoctorsExport => 'Exporter les médecins',
             self::AppointmentsManage => 'Gérer les rendez-vous',
             self::ConsultationsManage => 'Gérer les consultations',
             self::BillingManage => 'Gérer la facturation',
