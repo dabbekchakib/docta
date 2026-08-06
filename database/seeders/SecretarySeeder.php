@@ -9,6 +9,6 @@ class SecretarySeeder extends Seeder
 {
     public function run(): void
     {
-        Secretary::factory()->count(10)->create();
+        Secretary::factory()->count(20)->create();
     }
 }
