@@ -15,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser, HasName
 {
@@ -32,6 +32,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -48,6 +49,10 @@ class User extends Authenticatable implements FilamentUser, HasName
      */
     public function canAccessAdminPanel(): bool
     {
+        if (! $this->is_active) {
+            return false;
+        }
+
         return $this->hasAnyRole(
             collect(Role::cases())
                 ->filter(fn (Role $role) => $role->canAccessPanel())

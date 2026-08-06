@@ -35,6 +35,11 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::DoctorsUpdate,
             PermissionEnum::DoctorsDelete,
             PermissionEnum::DoctorsExport,
+            PermissionEnum::SecretariesView,
+            PermissionEnum::SecretariesCreate,
+            PermissionEnum::SecretariesUpdate,
+            PermissionEnum::SecretariesDelete,
+            PermissionEnum::SecretariesExport,
             PermissionEnum::ReportsView,
         ]);
         $this->createRole(RoleEnum::Doctor, [

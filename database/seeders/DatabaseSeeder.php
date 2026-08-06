@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             PatientSeeder::class,
             DoctorSeeder::class,
+            SecretarySeeder::class,
         ]);
 
         User::updateOrCreate(
