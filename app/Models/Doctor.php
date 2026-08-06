@@ -96,6 +96,14 @@ class Doctor extends Model implements HasMedia
     }
 
     /**
+     * Horaires de travail (module Agenda).
+     */
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(DoctorSchedule::class);
+    }
+
+    /**
      * Consultations (module Phase 4).
      */
     public function consultations(): HasMany

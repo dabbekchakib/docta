@@ -27,6 +27,13 @@ enum Permission: string
     case SecretariesExport = 'secretaries.export';
 
     case AppointmentsManage = 'appointments.manage';
+    case AppointmentsView = 'appointments.view';
+    case AppointmentsCreate = 'appointments.create';
+    case AppointmentsUpdate = 'appointments.update';
+    case AppointmentsDelete = 'appointments.delete';
+    case AppointmentsConfirm = 'appointments.confirm';
+    case AppointmentsCancel = 'appointments.cancel';
+    case AppointmentsCalendar = 'appointments.calendar';
 
     case ConsultationsManage = 'consultations.manage';
 
@@ -56,6 +63,13 @@ enum Permission: string
             self::SecretariesDelete => 'Supprimer des secrétaires',
             self::SecretariesExport => 'Exporter les secrétaires',
             self::AppointmentsManage => 'Gérer les rendez-vous',
+            self::AppointmentsView => 'Voir les rendez-vous',
+            self::AppointmentsCreate => 'Créer des rendez-vous',
+            self::AppointmentsUpdate => 'Modifier des rendez-vous',
+            self::AppointmentsDelete => 'Supprimer des rendez-vous',
+            self::AppointmentsConfirm => 'Confirmer des rendez-vous',
+            self::AppointmentsCancel => 'Annuler des rendez-vous',
+            self::AppointmentsCalendar => 'Consulter l\'agenda',
             self::ConsultationsManage => 'Gérer les consultations',
             self::BillingManage => 'Gérer la facturation',
             self::ReportsView => 'Consulter les rapports',

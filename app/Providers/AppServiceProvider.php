@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Secretary;
 use App\Models\User;
+use App\Policies\AppointmentPolicy;
 use App\Policies\DoctorPolicy;
 use App\Policies\PatientPolicy;
 use App\Policies\PermissionPolicy;
@@ -36,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Patient::class, PatientPolicy::class);
         Gate::policy(Doctor::class, DoctorPolicy::class);
         Gate::policy(Secretary::class, SecretaryPolicy::class);
+        Gate::policy(Appointment::class, AppointmentPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Permission::class, PermissionPolicy::class);
     }

@@ -76,9 +76,20 @@ class PatientView
                             ]),
                         Tab::make('Rendez-vous')
                             ->schema([
-                                Section::make('Aucun rendez-vous enregistré')
-                                    ->description('Le module Rendez-vous sera disponible dans la Phase 3.')
-                                    ->schema([]),
+                                RepeatableEntry::make('appointments')
+                                    ->label('Historique des rendez-vous')
+                                    ->state(fn (RepeatableEntry $component): array => self::resolveAppointments($component))
+                                    ->schema([
+                                        TextEntry::make('appointment_date')->label('Date'),
+                                        TextEntry::make('start_time')->label('Heure'),
+                                        TextEntry::make('doctor.full_name')->label('Médecin'),
+                                        TextEntry::make('type')->label('Type')
+                                            ->formatStateUsing(fn ($state): string => self::enumLabel($state)),
+                                        TextEntry::make('status')->label('Statut')
+                                            ->badge()
+                                            ->color(fn ($state): string => $state->getColor()),
+                                    ])
+                                    ->columns(3),
                             ]),
                         Tab::make('Consultations')
                             ->schema([
@@ -155,5 +166,31 @@ class PatientView
         }
 
         return (string) $state;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function resolveAppointments(RepeatableEntry $component): array
+    {
+        $patient = $component->getRecord();
+
+        if (! $patient instanceof Patient) {
+            return [];
+        }
+
+        return $patient->appointments()
+            ->with('doctor')
+            ->latest('appointment_date')
+            ->limit(20)
+            ->get()
+            ->map(fn ($appointment): array => [
+                'appointment_date' => $appointment->appointment_date?->format('d/m/Y') ?? '—',
+                'start_time' => $appointment->start_time,
+                'doctor.full_name' => $appointment->doctor?->full_name,
+                'type' => $appointment->type,
+                'status' => $appointment->status,
+            ])
+            ->all();
     }
 }
