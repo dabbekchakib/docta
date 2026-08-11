@@ -88,7 +88,10 @@ class AppointmentResourceTest extends TestCase
     {
         Notification::fake();
 
-        $appointment = Appointment::factory()->create(['notes' => 'Avant']);
+        $appointment = Appointment::factory()->create([
+            'notes' => 'Avant',
+            'appointment_date' => today()->addDays(5)->toDateString(),
+        ]);
 
         Livewire::actingAs($this->admin())
             ->test(EditAppointment::class, ['record' => $appointment->getKey()])

@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Appointments\Tables;
+namespace App\Filament\Resources\Consultations\Tables;
 
-use App\Enums\AppointmentStatus;
-use App\Enums\AppointmentType;
-use App\Filament\Resources\Consultations\Actions\StartConsultationAction;
+use App\Enums\ConsultationStatus;
+use App\Enums\ConsultationType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -13,14 +12,14 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-class AppointmentsTable
+class ConsultationsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('appointment_number')
-                    ->label('N° RDV')
+                TextColumn::make('consultation_number')
+                    ->label('N°')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
@@ -31,21 +30,19 @@ class AppointmentsTable
                 TextColumn::make('doctor.full_name')
                     ->label('Médecin')
                     ->searchable(['doctor.first_name', 'doctor.last_name']),
-                TextColumn::make('appointment_date')
+                TextColumn::make('consultation_date')
                     ->label('Date')
                     ->date('d/m/Y')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('start_time')
-                    ->label('Début')
-                    ->sortable(),
-                TextColumn::make('end_time')
-                    ->label('Fin')
-                    ->sortable(),
                 TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->color(fn (AppointmentType $state): string => $state->getColor()),
+                    ->color(fn (ConsultationType $state): string => $state->getColor()),
+                TextColumn::make('diagnosis')
+                    ->label('Diagnostic')
+                    ->limit(40)
+                    ->searchable(),
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -59,10 +56,10 @@ class AppointmentsTable
             ->filters([
                 SelectFilter::make('status')
                     ->label('Statut')
-                    ->options(AppointmentStatus::options()),
+                    ->options(ConsultationStatus::options()),
                 SelectFilter::make('type')
                     ->label('Type')
-                    ->options(AppointmentType::options()),
+                    ->options(ConsultationType::options()),
                 SelectFilter::make('doctor_id')
                     ->label('Médecin')
                     ->relationship('doctor', 'full_name')
@@ -70,7 +67,6 @@ class AppointmentsTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                StartConsultationAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([

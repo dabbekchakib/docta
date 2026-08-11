@@ -36,6 +36,11 @@ enum Permission: string
     case AppointmentsCalendar = 'appointments.calendar';
 
     case ConsultationsManage = 'consultations.manage';
+    case ConsultationsView = 'consultations.view';
+    case ConsultationsCreate = 'consultations.create';
+    case ConsultationsUpdate = 'consultations.update';
+    case ConsultationsDelete = 'consultations.delete';
+    case ConsultationsPrint = 'consultations.print';
 
     case BillingManage = 'billing.manage';
 
@@ -71,6 +76,11 @@ enum Permission: string
             self::AppointmentsCancel => 'Annuler des rendez-vous',
             self::AppointmentsCalendar => 'Consulter l\'agenda',
             self::ConsultationsManage => 'Gérer les consultations',
+            self::ConsultationsView => 'Voir les consultations',
+            self::ConsultationsCreate => 'Créer des consultations',
+            self::ConsultationsUpdate => 'Modifier des consultations',
+            self::ConsultationsDelete => 'Supprimer des consultations',
+            self::ConsultationsPrint => 'Imprimer des consultations',
             self::BillingManage => 'Gérer la facturation',
             self::ReportsView => 'Consulter les rapports',
         };

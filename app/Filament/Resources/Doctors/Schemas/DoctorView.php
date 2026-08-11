@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Doctors\Schemas;
 
 use App\Enums\DoctorStatus;
+use App\Filament\Resources\Consultations\ConsultationResource;
+use App\Models\Consultation;
 use App\Models\Doctor;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
@@ -92,9 +94,21 @@ class DoctorView
                             ]),
                         Tab::make('Consultations')
                             ->schema([
-                                Section::make('Aucune consultation enregistrée')
-                                    ->description('Le module Consultations sera disponible dans la Phase 4.')
-                                    ->schema([]),
+                                RepeatableEntry::make('consultations')
+                                    ->label('Historique des consultations')
+                                    ->state(fn (RepeatableEntry $component): array => self::resolveConsultations($component))
+                                    ->schema([
+                                        TextEntry::make('consultation_date')->label('Date'),
+                                        TextEntry::make('patient.full_name')->label('Patient'),
+                                        TextEntry::make('diagnosis')->label('Diagnostic'),
+                                        TextEntry::make('type')->label('Type')
+                                            ->formatStateUsing(fn ($state): string => self::enumLabel($state)),
+                                        TextEntry::make('open')->label('')
+                                            ->formatStateUsing(fn (): string => 'Ouvrir')
+                                            ->color('primary')
+                                            ->url(fn (TextEntry $component): ?string => self::consultationUrl($component)),
+                                    ])
+                                    ->columns(3),
                             ]),
                         Tab::make('Facturation')
                             ->schema([
@@ -156,6 +170,43 @@ class DoctorView
                 'causer' => $activity->causer?->name ?? 'Système',
             ])
             ->all();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function resolveConsultations(RepeatableEntry $component): array
+    {
+        $doctor = $component->getRecord();
+
+        if (! $doctor instanceof Doctor) {
+            return [];
+        }
+
+        return $doctor->consultations()
+            ->with('patient')
+            ->latest('consultation_date')
+            ->limit(20)
+            ->get()
+            ->map(fn (Consultation $consultation): array => [
+                'id' => $consultation->id,
+                'consultation_date' => $consultation->consultation_date?->format('d/m/Y') ?? '—',
+                'patient.full_name' => $consultation->patient?->full_name,
+                'diagnosis' => $consultation->diagnosis ? strip_tags((string) $consultation->diagnosis) : '—',
+                'type' => $consultation->type,
+            ])
+            ->all();
+    }
+
+    private static function consultationUrl(TextEntry $component): ?string
+    {
+        $item = $component->getRecord();
+
+        if (! is_array($item) || empty($item['id'])) {
+            return null;
+        }
+
+        return ConsultationResource::getUrl('view', ['record' => $item['id']]);
     }
 
     private static function enumLabel(mixed $state): string

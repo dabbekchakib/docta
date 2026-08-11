@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Patients\Schemas;
 
 use App\Enums\PatientStatus;
+use App\Filament\Resources\Consultations\ConsultationResource;
+use App\Models\Consultation;
 use App\Models\Patient;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -93,9 +95,23 @@ class PatientView
                             ]),
                         Tab::make('Consultations')
                             ->schema([
-                                Section::make('Aucune consultation enregistrée')
-                                    ->description('Le module Consultations sera disponible dans la Phase 4.')
-                                    ->schema([]),
+                                RepeatableEntry::make('consultations')
+                                    ->label('Historique des consultations')
+                                    ->state(fn (RepeatableEntry $component): array => self::resolveConsultations($component))
+                                    ->schema([
+                                        TextEntry::make('consultation_date')->label('Date'),
+                                        TextEntry::make('doctor.full_name')->label('Médecin'),
+                                        TextEntry::make('reason')->label('Motif'),
+                                        TextEntry::make('diagnosis')->label('Diagnostic'),
+                                        TextEntry::make('status')->label('Statut')
+                                            ->badge()
+                                            ->color(fn ($state): string => $state->getColor()),
+                                        TextEntry::make('open')->label('')
+                                            ->formatStateUsing(fn (): string => 'Ouvrir')
+                                            ->color('primary')
+                                            ->url(fn (TextEntry $component): ?string => self::consultationUrl($component)),
+                                    ])
+                                    ->columns(3),
                             ]),
                         Tab::make('Ordonnances')
                             ->schema([
@@ -192,5 +208,43 @@ class PatientView
                 'status' => $appointment->status,
             ])
             ->all();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function resolveConsultations(RepeatableEntry $component): array
+    {
+        $patient = $component->getRecord();
+
+        if (! $patient instanceof Patient) {
+            return [];
+        }
+
+        return $patient->consultations()
+            ->with('doctor')
+            ->latest('consultation_date')
+            ->limit(20)
+            ->get()
+            ->map(fn (Consultation $consultation): array => [
+                'id' => $consultation->id,
+                'consultation_date' => $consultation->consultation_date?->format('d/m/Y') ?? '—',
+                'doctor.full_name' => $consultation->doctor?->full_name,
+                'reason' => $consultation->reason,
+                'diagnosis' => $consultation->diagnosis ? strip_tags((string) $consultation->diagnosis) : '—',
+                'status' => $consultation->status,
+            ])
+            ->all();
+    }
+
+    private static function consultationUrl(TextEntry $component): ?string
+    {
+        $item = $component->getRecord();
+
+        if (! is_array($item) || empty($item['id'])) {
+            return null;
+        }
+
+        return ConsultationResource::getUrl('view', ['record' => $item['id']]);
     }
 }

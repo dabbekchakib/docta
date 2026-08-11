@@ -6,6 +6,7 @@ use App\Enums\AppointmentStatus;
 use App\Filament\Resources\Appointments\Actions\CancelAppointmentAction;
 use App\Filament\Resources\Appointments\Actions\ConfirmAppointmentAction;
 use App\Filament\Resources\Appointments\AppointmentResource;
+use App\Filament\Resources\Consultations\Actions\StartConsultationAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -28,6 +29,7 @@ class ViewAppointment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            StartConsultationAction::make(),
             ConfirmAppointmentAction::make(),
             CancelAppointmentAction::make(),
             EditAction::make(),
