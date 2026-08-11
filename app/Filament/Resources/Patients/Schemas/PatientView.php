@@ -11,6 +11,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Contracts\HasLabel;
 use Spatie\Activitylog\Models\Activity;
@@ -21,6 +22,9 @@ class PatientView
     {
         return $schema
             ->schema([
+                View::make('filament.infolists.dmp-alerts')
+                    ->columnSpanFull()
+                    ->viewData(fn (View $component): array => ['medicalRecord' => $component->getRecord()?->medicalRecord]),
                 Tabs::make('fiche_patient')
                     ->columnSpanFull()
                     ->tabs([
@@ -113,23 +117,14 @@ class PatientView
                                     ])
                                     ->columns(3),
                             ]),
-                        Tab::make('Ordonnances')
+                        Tab::make('Dossier médical')
                             ->schema([
-                                Section::make('Aucune ordonnance enregistrée')
-                                    ->description('Le module Ordonnances sera disponible dans la Phase 4.')
-                                    ->schema([]),
-                            ]),
-                        Tab::make('Factures')
-                            ->schema([
-                                Section::make('Aucune facture enregistrée')
-                                    ->description('Le module Facturation sera disponible dans la Phase 5.')
-                                    ->schema([]),
-                            ]),
-                        Tab::make('Documents')
-                            ->schema([
-                                Section::make('Aucun document enregistré')
-                                    ->description('La gestion des documents sera disponible dans la Phase 4.')
-                                    ->schema([]),
+                                View::make('filament.infolists.dmp-summary')
+                                    ->columnSpanFull()
+                                    ->viewData(fn (View $component): array => ['medicalRecord' => $component->getRecord()?->medicalRecord]),
+                                View::make('filament.infolists.dmp-timeline')
+                                    ->columnSpanFull()
+                                    ->viewData(fn (View $component): array => ['medicalRecord' => $component->getRecord()?->medicalRecord]),
                             ]),
                         Tab::make('Journal d\'activité')
                             ->schema([

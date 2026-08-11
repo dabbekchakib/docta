@@ -11,6 +11,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Contracts\HasLabel;
 use Spatie\Activitylog\Models\Activity;
@@ -21,6 +22,9 @@ class ConsultationView
     {
         return $schema
             ->schema([
+                View::make('filament.infolists.dmp-alerts')
+                    ->columnSpanFull()
+                    ->viewData(fn (View $component): array => ['medicalRecord' => $component->getRecord()?->patient?->medicalRecord]),
                 Tabs::make('fiche_consultation')
                     ->columnSpanFull()
                     ->tabs([
@@ -108,6 +112,12 @@ class ConsultationView
                                         TextEntry::make('recommendations')->label('Recommandations')->html()->placeholder('—')->columnSpanFull(),
                                         TextEntry::make('follow_up_date')->label('Prochain contrôle')->date('d/m/Y')->placeholder('—'),
                                     ]),
+                            ]),
+                        Tab::make('Dossier médical')
+                            ->schema([
+                                View::make('filament.infolists.dmp-summary')
+                                    ->columnSpanFull()
+                                    ->viewData(fn (View $component): array => ['medicalRecord' => $component->getRecord()?->patient?->medicalRecord]),
                             ]),
                         Tab::make('Documents')
                             ->schema([

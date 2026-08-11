@@ -42,6 +42,22 @@ enum Permission: string
     case ConsultationsDelete = 'consultations.delete';
     case ConsultationsPrint = 'consultations.print';
 
+    case MedicalRecordsView = 'medical_records.view';
+    case MedicalRecordsCreate = 'medical_records.create';
+    case MedicalRecordsUpdate = 'medical_records.update';
+    case MedicalRecordsDelete = 'medical_records.delete';
+    case MedicalHistoriesManage = 'medical_histories.manage';
+    case AllergiesManage = 'allergies.manage';
+    case ChronicDiseasesManage = 'chronic_diseases.manage';
+    case SurgicalHistoriesManage = 'surgical_histories.manage';
+    case FamilyHistoriesManage = 'family_histories.manage';
+    case MedicationsManage = 'medications.manage';
+    case VaccinationsManage = 'vaccinations.manage';
+    case MedicalDocumentsView = 'medical_documents.view';
+    case MedicalDocumentsCreate = 'medical_documents.create';
+    case MedicalDocumentsDelete = 'medical_documents.delete';
+    case MedicalDocumentsDownload = 'medical_documents.download';
+
     case BillingManage = 'billing.manage';
 
     case ReportsView = 'reports.view';
@@ -81,6 +97,21 @@ enum Permission: string
             self::ConsultationsUpdate => 'Modifier des consultations',
             self::ConsultationsDelete => 'Supprimer des consultations',
             self::ConsultationsPrint => 'Imprimer des consultations',
+            self::MedicalRecordsView => 'Voir les dossiers médicaux',
+            self::MedicalRecordsCreate => 'Créer des dossiers médicaux',
+            self::MedicalRecordsUpdate => 'Modifier des dossiers médicaux',
+            self::MedicalRecordsDelete => 'Supprimer des dossiers médicaux',
+            self::MedicalHistoriesManage => 'Gérer les antécédents médicaux',
+            self::AllergiesManage => 'Gérer les allergies',
+            self::ChronicDiseasesManage => 'Gérer les maladies chroniques',
+            self::SurgicalHistoriesManage => 'Gérer les antécédents chirurgicaux',
+            self::FamilyHistoriesManage => 'Gérer les antécédents familiaux',
+            self::MedicationsManage => 'Gérer les traitements permanents',
+            self::VaccinationsManage => 'Gérer les vaccinations',
+            self::MedicalDocumentsView => 'Voir les documents médicaux',
+            self::MedicalDocumentsCreate => 'Ajouter des documents médicaux',
+            self::MedicalDocumentsDelete => 'Supprimer des documents médicaux',
+            self::MedicalDocumentsDownload => 'Télécharger des documents médicaux',
             self::BillingManage => 'Gérer la facturation',
             self::ReportsView => 'Consulter les rapports',
         };

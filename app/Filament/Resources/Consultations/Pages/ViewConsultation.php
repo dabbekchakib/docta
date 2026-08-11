@@ -6,9 +6,13 @@ use App\Filament\Resources\Consultations\Actions\CancelConsultationAction;
 use App\Filament\Resources\Consultations\Actions\CompleteConsultationAction;
 use App\Filament\Resources\Consultations\Actions\PrintConsultationAction;
 use App\Filament\Resources\Consultations\ConsultationResource;
+use App\Filament\Resources\MedicalRecords\MedicalRecordResource;
+use App\Models\Consultation;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 
 class ViewConsultation extends ViewRecord
@@ -28,6 +32,14 @@ class ViewConsultation extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('openMedicalRecord')
+                ->label('Voir le dossier médical')
+                ->icon(Heroicon::OutlinedFolder)
+                ->color('gray')
+                ->visible(fn (): bool => $this->record instanceof Consultation
+                    && $this->record->patient?->medicalRecord
+                    && auth()->user()?->can('view', $this->record->patient->medicalRecord) ?? false)
+                ->url(fn (): string => MedicalRecordResource::getUrl('view', ['record' => $this->record->patient?->medicalRecord])),
             CompleteConsultationAction::make(),
             CancelConsultationAction::make(),
             PrintConsultationAction::make(),

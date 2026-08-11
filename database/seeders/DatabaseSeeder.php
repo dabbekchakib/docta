@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             SecretarySeeder::class,
             AppointmentSeeder::class,
             ConsultationSeeder::class,
+            MedicalRecordSeeder::class,
         ]);
 
         User::updateOrCreate(

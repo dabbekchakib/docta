@@ -3,10 +3,13 @@
 namespace App\Observers;
 
 use App\Models\Patient;
+use App\Services\MedicalRecordService;
 use Illuminate\Support\Facades\Auth;
 
 class PatientObserver
 {
+    public function __construct(private readonly MedicalRecordService $medicalRecords) {}
+
     public function creating(Patient $patient): void
     {
         $patient->patient_number ??= $this->generatePatientNumber();
@@ -14,6 +17,8 @@ class PatientObserver
 
     public function created(Patient $patient): void
     {
+        $this->medicalRecords->ensureForPatient($patient);
+
         $this->log($patient, 'Patient créé');
     }
 

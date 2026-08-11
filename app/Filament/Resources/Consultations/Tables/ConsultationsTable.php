@@ -26,10 +26,10 @@ class ConsultationsTable
                     ->color('primary'),
                 TextColumn::make('patient.full_name')
                     ->label('Patient')
-                    ->searchable(['patient.first_name', 'patient.last_name', 'patient.patient_number']),
+                    ->searchable(['first_name', 'last_name', 'patient_number']),
                 TextColumn::make('doctor.full_name')
                     ->label('Médecin')
-                    ->searchable(['doctor.first_name', 'doctor.last_name']),
+                    ->searchable(['first_name', 'last_name']),
                 TextColumn::make('consultation_date')
                     ->label('Date')
                     ->date('d/m/Y')
