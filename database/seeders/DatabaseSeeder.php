@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AppointmentSeeder::class,
             ConsultationSeeder::class,
             MedicalRecordSeeder::class,
+            PrescriptionSeeder::class,
         ]);
 
         User::updateOrCreate(

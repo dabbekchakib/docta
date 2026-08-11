@@ -1,25 +1,27 @@
 <?php
 
-namespace App\Filament\Resources\Consultations\Tables;
+namespace App\Filament\Resources\Prescriptions\Tables;
 
-use App\Enums\ConsultationStatus;
-use App\Enums\ConsultationType;
+use App\Enums\PrescriptionStatus;
+use App\Filament\Resources\Prescriptions\Actions\CancelPrescriptionAction;
+use App\Filament\Resources\Prescriptions\Actions\DuplicatePrescriptionAction;
+use App\Filament\Resources\Prescriptions\Actions\IssuePrescriptionAction;
+use App\Filament\Resources\Prescriptions\Actions\PrintPrescriptionAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-class ConsultationsTable
+class PrescriptionsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('consultation_number')
-                    ->label('N°')
+                TextColumn::make('prescription_number')
+                    ->label('N° ordonnance')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
@@ -30,16 +32,17 @@ class ConsultationsTable
                 TextColumn::make('doctor.full_name')
                     ->label('Médecin')
                     ->searchable(['first_name', 'last_name']),
-                TextColumn::make('consultation_date')
+                TextColumn::make('prescription_date')
                     ->label('Date')
                     ->date('d/m/Y')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('type')
-                    ->label('Type')
-                    ->badge()
-                    ->color(fn (ConsultationType $state): string => $state->getColor()),
-     
+              
+                TextColumn::make('valid_until')
+                    ->label('Valable jusqu\'au')
+                    ->date('d/m/Y')
+                    ->placeholder('—')
+                    ->toggleable(),
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -53,10 +56,11 @@ class ConsultationsTable
             ->filters([
                 SelectFilter::make('status')
                     ->label('Statut')
-                    ->options(ConsultationStatus::options()),
-                SelectFilter::make('type')
-                    ->label('Type')
-                    ->options(ConsultationType::options()),
+                    ->options(PrescriptionStatus::options()),
+                SelectFilter::make('patient_id')
+                    ->label('Patient')
+                    ->relationship('patient', 'full_name')
+                    ->searchable(),
                 SelectFilter::make('doctor_id')
                     ->label('Médecin')
                     ->relationship('doctor', 'full_name')
@@ -64,7 +68,10 @@ class ConsultationsTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
+                IssuePrescriptionAction::make(),
+                CancelPrescriptionAction::make(),
+                PrintPrescriptionAction::make(),
+                DuplicatePrescriptionAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

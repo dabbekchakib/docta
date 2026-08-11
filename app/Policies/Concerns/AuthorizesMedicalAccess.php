@@ -53,4 +53,9 @@ trait AuthorizesMedicalAccess
     {
         return $user->hasRole('doctor');
     }
+
+    protected function isSecretary(User $user): bool
+    {
+        return $user->hasRole('secretary');
+    }
 }

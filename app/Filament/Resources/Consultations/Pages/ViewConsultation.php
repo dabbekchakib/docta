@@ -7,7 +7,9 @@ use App\Filament\Resources\Consultations\Actions\CompleteConsultationAction;
 use App\Filament\Resources\Consultations\Actions\PrintConsultationAction;
 use App\Filament\Resources\Consultations\ConsultationResource;
 use App\Filament\Resources\MedicalRecords\MedicalRecordResource;
+use App\Filament\Resources\Prescriptions\PrescriptionResource;
 use App\Models\Consultation;
+use App\Models\Prescription;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -32,6 +34,12 @@ class ViewConsultation extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('createPrescription')
+                ->label('Créer une ordonnance')
+                ->icon(Heroicon::OutlinedClipboardDocumentList)
+                ->color('success')
+                ->visible(fn (): bool => auth()->user()?->can('create', Prescription::class) ?? false)
+                ->url(fn (): string => PrescriptionResource::getUrl('create', ['consultation' => $this->record->id])),
             Action::make('openMedicalRecord')
                 ->label('Voir le dossier médical')
                 ->icon(Heroicon::OutlinedFolder)

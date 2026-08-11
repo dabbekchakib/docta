@@ -15,6 +15,7 @@ use App\Models\MedicalHistory;
 use App\Models\MedicalRecord;
 use App\Models\Medication;
 use App\Models\Patient;
+use App\Models\Prescription;
 use App\Models\Secretary;
 use App\Models\SurgicalHistory;
 use App\Models\User;
@@ -31,6 +32,7 @@ use App\Policies\MedicalRecordPolicy;
 use App\Policies\MedicationPolicy;
 use App\Policies\PatientPolicy;
 use App\Policies\PermissionPolicy;
+use App\Policies\PrescriptionPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SecretaryPolicy;
 use App\Policies\SurgicalHistoryPolicy;
@@ -72,6 +74,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Medication::class, MedicationPolicy::class);
         Gate::policy(Vaccination::class, VaccinationPolicy::class);
         Gate::policy(MedicalDocument::class, MedicalDocumentPolicy::class);
+        Gate::policy(Prescription::class, PrescriptionPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Permission::class, PermissionPolicy::class);
 

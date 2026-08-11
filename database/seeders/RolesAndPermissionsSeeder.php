@@ -66,6 +66,14 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::MedicalDocumentsCreate,
             PermissionEnum::MedicalDocumentsDelete,
             PermissionEnum::MedicalDocumentsDownload,
+            PermissionEnum::PrescriptionsView,
+            PermissionEnum::PrescriptionsCreate,
+            PermissionEnum::PrescriptionsUpdate,
+            PermissionEnum::PrescriptionsDelete,
+            PermissionEnum::PrescriptionsIssue,
+            PermissionEnum::PrescriptionsCancel,
+            PermissionEnum::PrescriptionsPrint,
+            PermissionEnum::PrescriptionsExport,
             PermissionEnum::ReportsView,
         ]);
         $this->createRole(RoleEnum::Doctor, [
@@ -93,6 +101,11 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::MedicalDocumentsView,
             PermissionEnum::MedicalDocumentsCreate,
             PermissionEnum::MedicalDocumentsDownload,
+            PermissionEnum::PrescriptionsView,
+            PermissionEnum::PrescriptionsCreate,
+            PermissionEnum::PrescriptionsUpdate,
+            PermissionEnum::PrescriptionsIssue,
+            PermissionEnum::PrescriptionsPrint,
         ]);
         $this->createRole(RoleEnum::Secretary, [
             PermissionEnum::PatientsView,
@@ -107,6 +120,8 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::AppointmentsCancel,
             PermissionEnum::AppointmentsCalendar,
             PermissionEnum::ConsultationsView,
+            PermissionEnum::PrescriptionsView,
+            PermissionEnum::PrescriptionsPrint,
         ]);
         $this->createRole(RoleEnum::Patient, [
             PermissionEnum::PatientsView,

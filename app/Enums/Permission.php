@@ -58,6 +58,15 @@ enum Permission: string
     case MedicalDocumentsDelete = 'medical_documents.delete';
     case MedicalDocumentsDownload = 'medical_documents.download';
 
+    case PrescriptionsView = 'prescriptions.view';
+    case PrescriptionsCreate = 'prescriptions.create';
+    case PrescriptionsUpdate = 'prescriptions.update';
+    case PrescriptionsDelete = 'prescriptions.delete';
+    case PrescriptionsIssue = 'prescriptions.issue';
+    case PrescriptionsCancel = 'prescriptions.cancel';
+    case PrescriptionsPrint = 'prescriptions.print';
+    case PrescriptionsExport = 'prescriptions.export';
+
     case BillingManage = 'billing.manage';
 
     case ReportsView = 'reports.view';
@@ -112,6 +121,14 @@ enum Permission: string
             self::MedicalDocumentsCreate => 'Ajouter des documents médicaux',
             self::MedicalDocumentsDelete => 'Supprimer des documents médicaux',
             self::MedicalDocumentsDownload => 'Télécharger des documents médicaux',
+            self::PrescriptionsView => 'Voir les ordonnances',
+            self::PrescriptionsCreate => 'Créer des ordonnances',
+            self::PrescriptionsUpdate => 'Modifier des ordonnances',
+            self::PrescriptionsDelete => 'Supprimer des ordonnances',
+            self::PrescriptionsIssue => 'Émettre des ordonnances',
+            self::PrescriptionsCancel => 'Annuler des ordonnances',
+            self::PrescriptionsPrint => 'Imprimer des ordonnances',
+            self::PrescriptionsExport => 'Exporter des ordonnances',
             self::BillingManage => 'Gérer la facturation',
             self::ReportsView => 'Consulter les rapports',
         };
