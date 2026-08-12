@@ -29,6 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('DOCTA')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->colors([
                 'primary' => Color::Sky,
                 'danger' => Color::Rose,
@@ -42,6 +43,7 @@ class AdminPanelProvider extends PanelProvider
                 'Administration',
                 'Gestion',
                 'Facturation',
+                'Comptabilité',
                 'Paramètres',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

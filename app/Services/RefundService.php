@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\PaymentStatus;
 use App\Enums\RefundStatus;
+use App\Events\RefundCompleted;
 use App\Models\CreditNote;
 use App\Models\Payment;
 use App\Models\Refund;
@@ -153,6 +154,8 @@ class RefundService
             }
 
             $this->log($refund, $actor, 'Remboursement exécuté');
+
+            RefundCompleted::dispatch($refund, $actor);
 
             return $refund->fresh('payment', 'creditNote');
         });

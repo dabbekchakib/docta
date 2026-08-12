@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\InvoiceStatus;
+use App\Events\InvoiceCancelled;
+use App\Events\InvoiceIssued;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Notifications\InvoiceIssuedNotification;
@@ -150,6 +152,8 @@ class InvoiceService
 
         $invoice->patient?->notify(new InvoiceIssuedNotification($invoice));
 
+        InvoiceIssued::dispatch($invoice, $actor);
+
         return $invoice->fresh(['items', 'patient']);
     }
 
@@ -171,6 +175,10 @@ class InvoiceService
             ])->save();
 
             $this->log($invoice, $actor, 'Facture annulée', ['reason' => $reason]);
+
+            if ($invoice->status === InvoiceStatus::Cancelled) {
+                InvoiceCancelled::dispatch($invoice, $actor);
+            }
 
             return $invoice->fresh();
         });

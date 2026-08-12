@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\CreditNoteStatus;
 use App\Enums\InvoiceStatus;
+use App\Events\CreditNoteIssued;
 use App\Models\CreditNote;
 use App\Models\Invoice;
 use App\Models\User;
@@ -111,6 +112,8 @@ class CreditNoteService
                 ->causedBy($actor)
                 ->withProperties(['credit_note_number' => $creditNote->credit_note_number])
                 ->log('Avoir émis');
+
+            CreditNoteIssued::dispatch($creditNote, $actor);
 
             return $creditNote->fresh('invoice');
         });

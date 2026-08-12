@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\InvoiceStatus;
 use App\Enums\PaymentStatus;
+use App\Events\PaymentCompleted;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Receipt;
@@ -206,6 +207,8 @@ class PaymentService
                 'amount' => (string) $payment->amount,
                 'receipt_number' => $receipt->receipt_number,
             ]);
+
+            PaymentCompleted::dispatch($payment, $actor);
 
             return $payment->load('invoice', 'paymentMethod', 'receipt');
         });

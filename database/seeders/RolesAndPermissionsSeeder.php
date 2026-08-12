@@ -127,6 +127,10 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::FinancialReportsView,
             PermissionEnum::FinancialReportsExport,
             PermissionEnum::CashRegisterView,
+            PermissionEnum::AccountingView,
+            PermissionEnum::AccountingCreate,
+            PermissionEnum::AccountingCancel,
+            PermissionEnum::AccountingAccountsManage,
             PermissionEnum::ReportsView,
         ]);
         $this->createRole(RoleEnum::Doctor, [
@@ -239,6 +243,10 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::FinancialReportsView,
             PermissionEnum::FinancialReportsExport,
             PermissionEnum::CashRegisterView,
+            PermissionEnum::AccountingView,
+            PermissionEnum::AccountingCreate,
+            PermissionEnum::AccountingCancel,
+            PermissionEnum::AccountingAccountsManage,
         ]);
 
         $this->createAdminUsers();

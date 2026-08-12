@@ -135,6 +135,11 @@ enum Permission: string
 
     case CashRegisterView = 'cash_register.view';
 
+    case AccountingView = 'accounting.view';
+    case AccountingCreate = 'accounting.create';
+    case AccountingCancel = 'accounting.cancel';
+    case AccountingAccountsManage = 'accounting.accounts.manage';
+
     case BillingManage = 'billing.manage';
 
     case ReportsView = 'reports.view';
@@ -250,6 +255,10 @@ enum Permission: string
             self::FinancialReportsView => 'Voir les rapports financiers',
             self::FinancialReportsExport => 'Exporter les rapports financiers',
             self::CashRegisterView => 'Consulter la caisse',
+            self::AccountingView => 'Voir la comptabilité',
+            self::AccountingCreate => 'Saisir des écritures comptables',
+            self::AccountingCancel => 'Annuler des écritures comptables',
+            self::AccountingAccountsManage => 'Gérer le plan comptable',
             self::BillingManage => 'Gérer la facturation',
             self::ReportsView => 'Consulter les rapports',
         };
