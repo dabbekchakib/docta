@@ -67,6 +67,72 @@ enum Permission: string
     case PrescriptionsPrint = 'prescriptions.print';
     case PrescriptionsExport = 'prescriptions.export';
 
+    case LaboratoriesView = 'laboratories.view';
+    case LaboratoriesCreate = 'laboratories.create';
+    case LaboratoriesUpdate = 'laboratories.update';
+    case LaboratoriesDelete = 'laboratories.delete';
+
+    case LaboratoryTestsView = 'laboratory_tests.view';
+    case LaboratoryTestsCreate = 'laboratory_tests.create';
+    case LaboratoryTestsUpdate = 'laboratory_tests.update';
+    case LaboratoryTestsDelete = 'laboratory_tests.delete';
+
+    case LaboratoryRequestsView = 'laboratory_requests.view';
+    case LaboratoryRequestsCreate = 'laboratory_requests.create';
+    case LaboratoryRequestsUpdate = 'laboratory_requests.update';
+    case LaboratoryRequestsCancel = 'laboratory_requests.cancel';
+
+    case LaboratoryResultsView = 'laboratory_results.view';
+    case LaboratoryResultsCreate = 'laboratory_results.create';
+    case LaboratoryResultsUpdate = 'laboratory_results.update';
+    case LaboratoryResultsValidate = 'laboratory_results.validate';
+
+    case LaboratoryReportsView = 'laboratory_reports.view';
+    case LaboratoryReportsCreate = 'laboratory_reports.create';
+    case LaboratoryReportsDownload = 'laboratory_reports.download';
+
+    case ServicesView = 'services.view';
+    case ServicesCreate = 'services.create';
+    case ServicesUpdate = 'services.update';
+    case ServicesDelete = 'services.delete';
+
+    case TaxRatesView = 'tax_rates.view';
+    case TaxRatesManage = 'tax_rates.manage';
+
+    case PaymentMethodsView = 'payment_methods.view';
+    case PaymentMethodsManage = 'payment_methods.manage';
+
+    case InvoicesView = 'invoices.view';
+    case InvoicesCreate = 'invoices.create';
+    case InvoicesUpdate = 'invoices.update';
+    case InvoicesIssue = 'invoices.issue';
+    case InvoicesCancel = 'invoices.cancel';
+    case InvoicesDownload = 'invoices.download';
+    case InvoicesExport = 'invoices.export';
+
+    case PaymentsView = 'payments.view';
+    case PaymentsCreate = 'payments.create';
+    case PaymentsCancel = 'payments.cancel';
+    case PaymentsRefund = 'payments.refund';
+
+    case ReceiptsView = 'receipts.view';
+    case ReceiptsCreate = 'receipts.create';
+    case ReceiptsDownload = 'receipts.download';
+
+    case CreditNotesView = 'credit_notes.view';
+    case CreditNotesCreate = 'credit_notes.create';
+    case CreditNotesCancel = 'credit_notes.cancel';
+
+    case RefundsView = 'refunds.view';
+    case RefundsCreate = 'refunds.create';
+    case RefundsApprove = 'refunds.approve';
+    case RefundsReject = 'refunds.reject';
+
+    case FinancialReportsView = 'financial_reports.view';
+    case FinancialReportsExport = 'financial_reports.export';
+
+    case CashRegisterView = 'cash_register.view';
+
     case BillingManage = 'billing.manage';
 
     case ReportsView = 'reports.view';
@@ -129,6 +195,57 @@ enum Permission: string
             self::PrescriptionsCancel => 'Annuler des ordonnances',
             self::PrescriptionsPrint => 'Imprimer des ordonnances',
             self::PrescriptionsExport => 'Exporter des ordonnances',
+            self::LaboratoriesView => 'Voir les laboratoires',
+            self::LaboratoriesCreate => 'Créer des laboratoires',
+            self::LaboratoriesUpdate => 'Modifier des laboratoires',
+            self::LaboratoriesDelete => 'Supprimer des laboratoires',
+            self::LaboratoryTestsView => 'Voir les examens de laboratoire',
+            self::LaboratoryTestsCreate => 'Créer des examens de laboratoire',
+            self::LaboratoryTestsUpdate => 'Modifier des examens de laboratoire',
+            self::LaboratoryTestsDelete => 'Supprimer des examens de laboratoire',
+            self::LaboratoryRequestsView => 'Voir les demandes d\'examens',
+            self::LaboratoryRequestsCreate => 'Créer des demandes d\'examens',
+            self::LaboratoryRequestsUpdate => 'Modifier des demandes d\'examens',
+            self::LaboratoryRequestsCancel => 'Annuler des demandes d\'examens',
+            self::LaboratoryResultsView => 'Voir les résultats de laboratoire',
+            self::LaboratoryResultsCreate => 'Saisir des résultats de laboratoire',
+            self::LaboratoryResultsUpdate => 'Modifier des résultats de laboratoire',
+            self::LaboratoryResultsValidate => 'Valider biologiquement les résultats',
+            self::LaboratoryReportsView => 'Voir les comptes rendus de laboratoire',
+            self::LaboratoryReportsCreate => 'Générer des comptes rendus de laboratoire',
+            self::LaboratoryReportsDownload => 'Télécharger les comptes rendus de laboratoire',
+            self::ServicesView => 'Voir les prestations',
+            self::ServicesCreate => 'Créer des prestations',
+            self::ServicesUpdate => 'Modifier des prestations',
+            self::ServicesDelete => 'Supprimer des prestations',
+            self::TaxRatesView => 'Voir les taux de taxe',
+            self::TaxRatesManage => 'Gérer les taux de taxe',
+            self::PaymentMethodsView => 'Voir les moyens de paiement',
+            self::PaymentMethodsManage => 'Gérer les moyens de paiement',
+            self::InvoicesView => 'Voir les factures',
+            self::InvoicesCreate => 'Créer des factures',
+            self::InvoicesUpdate => 'Modifier des factures',
+            self::InvoicesIssue => 'Émettre des factures',
+            self::InvoicesCancel => 'Annuler des factures',
+            self::InvoicesDownload => 'Télécharger des factures',
+            self::InvoicesExport => 'Exporter des factures',
+            self::PaymentsView => 'Voir les paiements',
+            self::PaymentsCreate => 'Encaisser des paiements',
+            self::PaymentsCancel => 'Annuler des paiements',
+            self::PaymentsRefund => 'Rembourser des paiements',
+            self::ReceiptsView => 'Voir les reçus',
+            self::ReceiptsCreate => 'Créer des reçus',
+            self::ReceiptsDownload => 'Télécharger des reçus',
+            self::CreditNotesView => 'Voir les avoirs',
+            self::CreditNotesCreate => 'Créer des avoirs',
+            self::CreditNotesCancel => 'Annuler des avoirs',
+            self::RefundsView => 'Voir les remboursements',
+            self::RefundsCreate => 'Créer des remboursements',
+            self::RefundsApprove => 'Approuver des remboursements',
+            self::RefundsReject => 'Refuser des remboursements',
+            self::FinancialReportsView => 'Voir les rapports financiers',
+            self::FinancialReportsExport => 'Exporter les rapports financiers',
+            self::CashRegisterView => 'Consulter la caisse',
             self::BillingManage => 'Gérer la facturation',
             self::ReportsView => 'Consulter les rapports',
         };

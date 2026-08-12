@@ -6,9 +6,13 @@ use App\Filament\Resources\Consultations\Actions\CancelConsultationAction;
 use App\Filament\Resources\Consultations\Actions\CompleteConsultationAction;
 use App\Filament\Resources\Consultations\Actions\PrintConsultationAction;
 use App\Filament\Resources\Consultations\ConsultationResource;
+use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Filament\Resources\LaboratoryRequests\LaboratoryRequestResource;
 use App\Filament\Resources\MedicalRecords\MedicalRecordResource;
 use App\Filament\Resources\Prescriptions\PrescriptionResource;
 use App\Models\Consultation;
+use App\Models\Invoice;
+use App\Models\LaboratoryRequest;
 use App\Models\Prescription;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -34,12 +38,24 @@ class ViewConsultation extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('createInvoice')
+                ->label('Créer une facture')
+                ->icon(Heroicon::OutlinedReceiptPercent)
+                ->color('primary')
+                ->visible(fn (): bool => auth()->user()?->can('create', Invoice::class) ?? false)
+                ->url(fn (): string => InvoiceResource::getUrl('create', ['consultation' => $this->record->id])),
             Action::make('createPrescription')
                 ->label('Créer une ordonnance')
                 ->icon(Heroicon::OutlinedClipboardDocumentList)
                 ->color('success')
                 ->visible(fn (): bool => auth()->user()?->can('create', Prescription::class) ?? false)
                 ->url(fn (): string => PrescriptionResource::getUrl('create', ['consultation' => $this->record->id])),
+            Action::make('prescribeLaboratory')
+                ->label('Prescrire un examen')
+                ->icon(Heroicon::OutlinedBeaker)
+                ->color('primary')
+                ->visible(fn (): bool => auth()->user()?->can('create', LaboratoryRequest::class) ?? false)
+                ->url(fn (): string => LaboratoryRequestResource::getUrl('create', ['consultation' => $this->record->id])),
             Action::make('openMedicalRecord')
                 ->label('Voir le dossier médical')
                 ->icon(Heroicon::OutlinedFolder)

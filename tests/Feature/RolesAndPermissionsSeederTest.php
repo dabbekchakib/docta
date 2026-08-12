@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Permission as PermissionEnum;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,11 +18,13 @@ class RolesAndPermissionsSeederTest extends TestCase
     {
         $this->seed(RolesAndPermissionsSeeder::class);
 
+        $expectedCount = count(PermissionEnum::cases());
+
         $this->assertDatabaseCount('roles', 6);
-        $this->assertDatabaseCount('permissions', 57);
+        $this->assertDatabaseCount('permissions', $expectedCount);
 
         $superAdmin = Role::findByName('super_admin');
-        $this->assertCount(57, $superAdmin->permissions);
+        $this->assertCount($expectedCount, $superAdmin->permissions);
 
         $doctor = Role::findByName('doctor');
         $this->assertFalse($doctor->hasPermissionTo('consultations.manage'));

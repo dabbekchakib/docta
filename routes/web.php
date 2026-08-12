@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LaboratoryReportController;
 use App\Http\Controllers\MedicalDocumentController;
 use App\Http\Controllers\PrescriptionVerificationController;
 use App\Http\Controllers\ProfileController;
@@ -25,6 +26,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/documents-medicaux/{medicalDocument}/telecharger', [MedicalDocumentController::class, 'download'])
         ->name('medical-documents.download');
+
+    Route::get('/comptes-rendus-laboratoire/{laboratoryReport}/telecharger', [LaboratoryReportController::class, 'download'])
+        ->name('laboratory-reports.download');
 
     Route::get('/ordonnances/verification/{token}', [PrescriptionVerificationController::class, 'show'])
         ->name('prescriptions.verify');

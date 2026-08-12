@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Consultations\Schemas;
 
 use App\Enums\ConsultationStatus;
 use App\Enums\ConsultationType;
+use App\Enums\LaboratoryRequestStatus;
+use App\Filament\Resources\LaboratoryRequests\LaboratoryRequestResource;
 use App\Models\Consultation;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
@@ -113,6 +115,25 @@ class ConsultationView
                                         TextEntry::make('follow_up_date')->label('Prochain contrôle')->date('d/m/Y')->placeholder('—'),
                                     ]),
                             ]),
+                        Tab::make('Examens biologiques')
+                            ->schema([
+                                RepeatableEntry::make('laboratory_requests')
+                                    ->label('Demandes d\'examens')
+                                    ->state(fn (RepeatableEntry $component): array => self::resolveLaboratoryRequests($component))
+                                    ->schema([
+                                        TextEntry::make('request_number')->label('N° demande'),
+                                        TextEntry::make('requested_at')->label('Date'),
+                                        TextEntry::make('tests')->label('Examens'),
+                                        TextEntry::make('status')->label('Statut')
+                                            ->badge()
+                                            ->color(fn ($state): string => self::requestStatusColor($state)),
+                                        TextEntry::make('open')->label('')
+                                            ->formatStateUsing(fn (): string => 'Ouvrir')
+                                            ->color('primary')
+                                            ->url(fn (TextEntry $component): ?string => self::laboratoryRequestUrl($component)),
+                                    ])
+                                    ->columns(4),
+                            ]),
                         Tab::make('Dossier médical')
                             ->schema([
                                 View::make('filament.infolists.dmp-summary')
@@ -152,6 +173,54 @@ class ConsultationView
     /**
      * @return array<int, array<string, string>>
      */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function resolveLaboratoryRequests(RepeatableEntry $component): array
+    {
+        $consultation = $component->getRecord();
+
+        if (! $consultation instanceof Consultation) {
+            return [];
+        }
+
+        return $consultation->laboratoryRequests()
+            ->with('items.test')
+            ->latest('requested_at')
+            ->limit(20)
+            ->get()
+            ->map(fn ($request): array => [
+                'id' => $request->id,
+                'request_number' => $request->request_number,
+                'requested_at' => $request->requested_at?->format('d/m/Y') ?? '—',
+                'tests' => $request->items->pluck('test.name')->filter()->implode(', ') ?: '—',
+                'status' => $request->status,
+            ])
+            ->all();
+    }
+
+    private static function requestStatusColor(mixed $state): string
+    {
+        if ($state instanceof LaboratoryRequestStatus) {
+            return $state->getColor();
+        }
+
+        $status = is_string($state) ? LaboratoryRequestStatus::tryFrom($state) : null;
+
+        return $status?->getColor() ?? 'gray';
+    }
+
+    private static function laboratoryRequestUrl(TextEntry $component): ?string
+    {
+        $item = $component->getRecord();
+
+        if (! is_array($item) || empty($item['id'])) {
+            return null;
+        }
+
+        return LaboratoryRequestResource::getUrl('view', ['record' => $item['id']]);
+    }
+
     private static function resolveActivities(RepeatableEntry $component): array
     {
         $consultation = $component->getRecord();

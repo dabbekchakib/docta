@@ -3,8 +3,12 @@
 namespace App\Filament\Resources\Patients\Schemas;
 
 use App\Enums\PatientStatus;
+use App\Enums\LaboratoryRequestStatus;
 use App\Filament\Resources\Consultations\ConsultationResource;
+use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Filament\Resources\LaboratoryRequests\LaboratoryRequestResource;
 use App\Models\Consultation;
+use App\Models\Invoice;
 use App\Models\Patient;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -117,6 +121,50 @@ class PatientView
                                     ])
                                     ->columns(3),
                             ]),
+                        Tab::make('Examens')
+                            ->schema([
+                                RepeatableEntry::make('laboratory_requests')
+                                    ->label('Historique des examens biologiques')
+                                    ->state(fn (RepeatableEntry $component): array => self::resolveLaboratoryRequests($component))
+                                    ->schema([
+                                        TextEntry::make('request_number')->label('N° demande'),
+                                        TextEntry::make('requested_at')->label('Date'),
+                                        TextEntry::make('doctor.full_name')->label('Médecin'),
+                                        TextEntry::make('tests')->label('Examens'),
+                                        TextEntry::make('status')->label('Statut')
+                                            ->badge()
+                                            ->color(fn ($state): string => self::requestStatusColor($state)),
+                                        TextEntry::make('open')->label('')
+                                            ->formatStateUsing(fn (): string => 'Ouvrir')
+                                            ->color('primary')
+                                            ->url(fn (TextEntry $component): ?string => self::laboratoryRequestUrl($component)),
+                                    ])
+                                    ->columns(4),
+                            ]),
+                        Tab::make('Facturation')
+                            ->schema([
+                                RepeatableEntry::make('invoices')
+                                    ->label('Historique financier')
+                                    ->state(fn (RepeatableEntry $component): array => self::resolveInvoices($component))
+                                    ->schema([
+                                        TextEntry::make('invoice_number')->label('N° facture'),
+                                        TextEntry::make('invoice_date')->label('Date'),
+                                        TextEntry::make('doctor.full_name')->label('Médecin')->placeholder('—'),
+                                        TextEntry::make('total')->label('Total')
+                                            ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT'),
+                                        TextEntry::make('amount_remaining')->label('Restant dû')
+                                            ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
+                                            ->color(fn (mixed $state): string => (float) $state > 0 ? 'danger' : 'success'),
+                                        TextEntry::make('status')->label('Statut')
+                                            ->badge()
+                                            ->color(fn ($state): string => self::invoiceStatusColor($state)),
+                                        TextEntry::make('open')->label('')
+                                            ->formatStateUsing(fn (): string => 'Ouvrir')
+                                            ->color('primary')
+                                            ->url(fn (TextEntry $component): ?string => self::invoiceUrl($component)),
+                                    ])
+                                    ->columns(4),
+                            ]),
                         Tab::make('Dossier médical')
                             ->schema([
                                 View::make('filament.infolists.dmp-summary')
@@ -182,6 +230,55 @@ class PatientView
     /**
      * @return array<int, array<string, mixed>>
      */
+    private static function resolveLaboratoryRequests(RepeatableEntry $component): array
+    {
+        $patient = $component->getRecord();
+
+        if (! $patient instanceof Patient) {
+            return [];
+        }
+
+        return $patient->laboratoryRequests()
+            ->with('doctor', 'items.test')
+            ->latest('requested_at')
+            ->limit(20)
+            ->get()
+            ->map(fn ($request): array => [
+                'id' => $request->id,
+                'request_number' => $request->request_number,
+                'requested_at' => $request->requested_at?->format('d/m/Y') ?? '—',
+                'doctor.full_name' => $request->doctor?->full_name,
+                'tests' => $request->items->pluck('test.name')->filter()->implode(', ') ?: '—',
+                'status' => $request->status,
+            ])
+            ->all();
+    }
+
+    private static function requestStatusColor(mixed $state): string
+    {
+        if ($state instanceof LaboratoryRequestStatus) {
+            return $state->getColor();
+        }
+
+        $status = is_string($state) ? LaboratoryRequestStatus::tryFrom($state) : null;
+
+        return $status?->getColor() ?? 'gray';
+    }
+
+    private static function laboratoryRequestUrl(TextEntry $component): ?string
+    {
+        $item = $component->getRecord();
+
+        if (! is_array($item) || empty($item['id'])) {
+            return null;
+        }
+
+        return LaboratoryRequestResource::getUrl('view', ['record' => $item['id']]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private static function resolveAppointments(RepeatableEntry $component): array
     {
         $patient = $component->getRecord();
@@ -241,5 +338,55 @@ class PatientView
         }
 
         return ConsultationResource::getUrl('view', ['record' => $item['id']]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function resolveInvoices(RepeatableEntry $component): array
+    {
+        $patient = $component->getRecord();
+
+        if (! $patient instanceof Patient) {
+            return [];
+        }
+
+        return $patient->invoices()
+            ->with('doctor')
+            ->latest('invoice_date')
+            ->limit(30)
+            ->get()
+            ->map(fn (Invoice $invoice): array => [
+                'id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'invoice_date' => $invoice->invoice_date?->format('d/m/Y') ?? '—',
+                'doctor.full_name' => $invoice->doctor?->full_name,
+                'total' => $invoice->total,
+                'amount_remaining' => $invoice->amount_remaining,
+                'status' => $invoice->status,
+            ])
+            ->all();
+    }
+
+    private static function invoiceStatusColor(mixed $state): string
+    {
+        if ($state instanceof \App\Enums\InvoiceStatus) {
+            return $state->getColor();
+        }
+
+        $status = is_string($state) ? \App\Enums\InvoiceStatus::tryFrom($state) : null;
+
+        return $status?->getColor() ?? 'gray';
+    }
+
+    private static function invoiceUrl(TextEntry $component): ?string
+    {
+        $item = $component->getRecord();
+
+        if (! is_array($item) || empty($item['id'])) {
+            return null;
+        }
+
+        return InvoiceResource::getUrl('view', ['record' => $item['id']]);
     }
 }

@@ -96,6 +96,14 @@ class Consultation extends Model implements HasMedia
     }
 
     /**
+     * Demandes d'examens de laboratoire prescrites lors de cette consultation (module Phase 9).
+     */
+    public function laboratoryRequests(): HasMany
+    {
+        return $this->hasMany(LaboratoryRequest::class);
+    }
+
+    /**
      * Journal d'activité.
      *
      * @return MorphMany<Activity, $this>

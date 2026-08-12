@@ -128,6 +128,14 @@ class Doctor extends Model implements HasMedia
     }
 
     /**
+     * Demandes d'examens de laboratoire (module Phase 9).
+     */
+    public function laboratoryRequests(): HasMany
+    {
+        return $this->hasMany(LaboratoryRequest::class);
+    }
+
+    /**
      * Journal d'activité.
      *
      * @return MorphMany<Activity, $this>

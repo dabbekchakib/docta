@@ -115,6 +115,14 @@ class Patient extends Model
     }
 
     /**
+     * Demandes d'examens de laboratoire (module Phase 9).
+     */
+    public function laboratoryRequests(): HasMany
+    {
+        return $this->hasMany(LaboratoryRequest::class);
+    }
+
+    /**
      * Factures (module Phase 5).
      */
     public function invoices(): HasMany

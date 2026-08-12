@@ -179,6 +179,24 @@ class MedicalRecordService
             ));
         }
 
+        foreach ($patient->laboratoryRequests()->with('items.test')->get() as $request) {
+            $tests = $request->items->pluck('test.name')->filter()->take(3)->implode(', ');
+
+            $events->push($this->event(
+                $request->requested_at?->startOfDay(),
+                'examen_laboratoire',
+                'Examen de laboratoire',
+                $request->request_number,
+                collect([
+                    $request->status->getLabel(),
+                    $tests !== '' ? $tests : null,
+                ])->filter()->implode(' — '),
+                $request->isValidated()
+                    ? 'success'
+                    : ($request->status === \App\Enums\LaboratoryRequestStatus::Cancelled ? 'danger' : 'warning')
+            ));
+        }
+
         return $events
             ->filter(fn (array $event): bool => $event['date'] !== null)
             ->sortByDesc(fn (array $event): string => $event['date']->toDateString())

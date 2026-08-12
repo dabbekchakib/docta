@@ -59,6 +59,18 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Stockage privé des comptes rendus de laboratoire (PDF).
+         * Accès contrôlé côté serveur via Policy + téléchargement sécurisé.
+         */
+        'laboratory-reports' => [
+            'driver' => 'local',
+            'root' => storage_path('app/laboratory-reports'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

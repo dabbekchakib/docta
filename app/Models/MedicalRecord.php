@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -93,6 +94,21 @@ class MedicalRecord extends Model
     public function lifestyle(): HasOne
     {
         return $this->hasOne(Lifestyle::class);
+    }
+
+    /**
+     * Demandes d'examens de laboratoire du patient (module Phase 9).
+     */
+    public function laboratoryRequests(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            LaboratoryRequest::class,
+            Patient::class,
+            'id',
+            'patient_id',
+            'patient_id',
+            'id'
+        );
     }
 
     /**
