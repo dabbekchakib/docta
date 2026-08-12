@@ -32,7 +32,7 @@ class CreateCreditNoteAction extends Action
                     ->required()
                     ->minValue(0.001)
                     ->prefix('DT')
-                    ->default(fn (Action $action): string => $action->getRecord()->total > 0
+                    ->default(fn (Action $action): string => ($action->getRecord()?->total ?? 0) > 0
                         ? number_format((float) $action->getRecord()->total, 3, '.', '')
                         : '0.000'),
                 DatePicker::make('credit_note_date')

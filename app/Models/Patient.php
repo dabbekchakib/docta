@@ -131,6 +131,38 @@ class Patient extends Model
     }
 
     /**
+     * Paiements (module Phase 5).
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Reçus (module Phase 5).
+     */
+    public function receipts(): HasMany
+    {
+        return $this->hasMany(Receipt::class);
+    }
+
+    /**
+     * Avoirs (module Phase 5).
+     */
+    public function creditNotes(): HasMany
+    {
+        return $this->hasMany(CreditNote::class);
+    }
+
+    /**
+     * Remboursements (module Phase 5).
+     */
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Refund::class);
+    }
+
+    /**
      * Dossier médical (module Phase 4).
      */
     public function medicalRecord(): HasOne

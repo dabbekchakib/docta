@@ -6,6 +6,8 @@ use App\Enums\PaymentStatus;
 use App\Filament\Resources\Payments\Actions\CancelPaymentAction;
 use App\Filament\Resources\Payments\Actions\DownloadPaymentReceiptAction;
 use App\Filament\Resources\Payments\Actions\RequestRefundAction;
+use App\Filament\Resources\Payments\Actions\ValidatePaymentAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -56,6 +58,10 @@ class PaymentsTable
                 SelectFilter::make('payment_method_id')
                     ->label('Moyen de paiement')
                     ->relationship('paymentMethod', 'name'),
+                SelectFilter::make('invoice_id')
+                    ->label('Facture')
+                    ->relationship('invoice', 'invoice_number')
+                    ->searchable(),
                 SelectFilter::make('patient_id')
                     ->label('Patient')
                     ->relationship('patient', 'full_name')
@@ -63,6 +69,12 @@ class PaymentsTable
             ])
             ->recordActions([
                 ViewAction::make(),
+                ValidatePaymentAction::make(),
+                EditAction::make()
+                    ->label('Modifier')
+                    ->visible(fn ($record): bool => $record instanceof \App\Models\Payment
+                        && $record->status === PaymentStatus::Pending
+                        && auth()->user()?->can('update', $record) ?? false),
                 DownloadPaymentReceiptAction::make(),
                 RequestRefundAction::make(),
                 CancelPaymentAction::make(),

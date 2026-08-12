@@ -65,11 +65,11 @@ class InvoiceView
                             ->alignEnd(),
                     ])
                     ->columns(3),
-                Section::make('Détail des prestations')
+                Section::make('Prestations')
                     ->columnSpanFull()
                     ->schema([
                         RepeatableEntry::make('items')
-                            ->label('Prestations')
+                            ->label('Prestations facturées')
                             ->schema([
                                 TextEntry::make('description')->label('Désignation')->weight('semibold'),
                                 TextEntry::make('quantity')->label('Qté')
@@ -87,25 +87,86 @@ class InvoiceView
                             ])
                             ->columns(3),
                     ]),
+                Section::make('Paiements')
+                    ->columnSpanFull()
+                    ->schema([
+                        RepeatableEntry::make('payments')
+                            ->label('Paiements reçus')
+                            ->state(fn (RepeatableEntry $component): array => self::resolvePayments($component))
+                            ->schema([
+                                TextEntry::make('payment_number')->label('N° paiement'),
+                                TextEntry::make('payment_date')->label('Date')
+                                    ->formatStateUsing(fn ($state): string => $state ? $state->format('d/m/Y') : '—'),
+                                TextEntry::make('amount')->label('Montant')
+                                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
+                                    ->alignEnd()
+                                    ->weight('semibold'),
+                                TextEntry::make('payment_method')->label('Mode'),
+                                TextEntry::make('status')->label('Statut')
+                                    ->badge()
+                                    ->color(fn (mixed $state): string => self::paymentStatusColor($state)),
+                                TextEntry::make('reference')->label('Référence')->placeholder('—'),
+                                TextEntry::make('received_by')->label('Utilisateur'),
+                            ])
+                            ->columns(4),
+                    ]),
                 Section::make('Notes')
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('notes')->label('Notes')->placeholder('—')->columnSpanFull(),
                     ]),
-                Section::make('Journal d\'activité')
+                Section::make('Historique')
                     ->columnSpanFull()
                     ->schema([
                         RepeatableEntry::make('activities')
-                            ->label('Activités récentes')
+                            ->label('Journal d\'activité')
                             ->state(fn (RepeatableEntry $component): array => self::resolveActivities($component))
                             ->schema([
                                 TextEntry::make('created_at')->label('Date'),
                                 TextEntry::make('description')->label('Action'),
-                                TextEntry::make('causer')->label('Utilisateur'),
+                                TextEntry::make('causer.name')->label('Utilisateur'),
                             ])
                             ->columns(3),
                     ]),
             ]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function resolvePayments(RepeatableEntry $component): array
+    {
+        $record = $component->getRecord();
+
+        if (! $record instanceof Invoice) {
+            return [];
+        }
+
+        return $record->payments()
+            ->with('paymentMethod', 'receivedBy')
+            ->latest('payment_date')
+            ->get()
+            ->map(fn ($payment): array => [
+                'payment_number' => $payment->payment_number,
+                'payment_date' => $payment->payment_date,
+                'amount' => $payment->amount,
+                'payment_method' => $payment->paymentMethod?->name,
+                'status' => $payment->status,
+                'reference' => $payment->reference,
+                'received_by' => $payment->receivedBy?->name,
+            ])
+            ->all();
+    }
+
+    private static function paymentStatusColor(mixed $state): string
+    {
+        if ($state instanceof \App\Enums\PaymentStatus) {
+            return $state->getColor();
+        }
+
+        $status = is_string($state) ? \App\Enums\PaymentStatus::tryFrom($state) : null;
+
+        return $status?->getColor() ?? 'gray';
     }
 
     /**

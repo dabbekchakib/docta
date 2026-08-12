@@ -112,6 +112,8 @@ enum Permission: string
 
     case PaymentsView = 'payments.view';
     case PaymentsCreate = 'payments.create';
+    case PaymentsUpdate = 'payments.update';
+    case PaymentsValidate = 'payments.validate';
     case PaymentsCancel = 'payments.cancel';
     case PaymentsRefund = 'payments.refund';
 
@@ -231,6 +233,8 @@ enum Permission: string
             self::InvoicesExport => 'Exporter des factures',
             self::PaymentsView => 'Voir les paiements',
             self::PaymentsCreate => 'Encaisser des paiements',
+            self::PaymentsUpdate => 'Modifier des paiements',
+            self::PaymentsValidate => 'Valider des paiements',
             self::PaymentsCancel => 'Annuler des paiements',
             self::PaymentsRefund => 'Rembourser des paiements',
             self::ReceiptsView => 'Voir les reçus',

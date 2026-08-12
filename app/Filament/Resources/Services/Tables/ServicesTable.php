@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Services\Tables;
 
 use App\Enums\ServiceCategory;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -50,6 +52,13 @@ class ServicesTable
                     ->label('Activité')
                     ->trueLabel('Active')
                     ->falseLabel('Inactive'),
+            ])
+            ->recordActions([
+                EditAction::make()
+                    ->label('Modifier'),
+                DeleteAction::make()
+                    ->label('Supprimer')
+                    ->iconButton(),
             ])
             ->defaultSort('code');
     }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\CreditNoteStatus;
 use App\Enums\InvoiceStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\RefundStatus;
 use App\Models\CreditNote;
 use App\Models\Doctor;
@@ -44,6 +45,10 @@ class BillingPolicyTest extends TestCase
         $this->assertTrue($admin->can('download', $invoice));
         $this->assertTrue($admin->can('create', Payment::class));
         $this->assertTrue($admin->can('cancel', $payment));
+        $this->assertTrue($admin->can('update', Payment::factory()->create(['status' => PaymentStatus::Pending])));
+        $this->assertTrue($admin->can('validate', Payment::factory()->create(['status' => PaymentStatus::Pending])));
+        $this->assertFalse($admin->can('update', $payment));
+        $this->assertFalse($admin->can('validate', $payment));
         $this->assertTrue($admin->can('create', Receipt::class));
         $this->assertTrue($admin->can('download', $receipt));
         $this->assertTrue($admin->can('create', CreditNote::class));
@@ -75,6 +80,8 @@ class BillingPolicyTest extends TestCase
         $this->assertFalse($doctorUser->can('update', $ownInvoice));
         $this->assertFalse($doctorUser->can('cancel', $ownInvoice));
         $this->assertFalse($doctorUser->can('create', Payment::class));
+        $this->assertFalse($doctorUser->can('update', Payment::factory()->create(['status' => PaymentStatus::Pending])));
+        $this->assertFalse($doctorUser->can('validate', Payment::factory()->create(['status' => PaymentStatus::Pending])));
         $this->assertFalse($doctorUser->can('create', CreditNote::class));
         $this->assertFalse($doctorUser->can('create', Refund::class));
     }
@@ -88,6 +95,10 @@ class BillingPolicyTest extends TestCase
         $this->assertTrue($secretary->can('issue', Invoice::factory()->create(['status' => InvoiceStatus::Draft])));
         $this->assertTrue($secretary->can('create', Payment::class));
         $this->assertTrue($secretary->can('cancel', Payment::factory()->create()));
+        $this->assertTrue($secretary->can('update', Payment::factory()->create(['status' => PaymentStatus::Pending])));
+        $this->assertTrue($secretary->can('validate', Payment::factory()->create(['status' => PaymentStatus::Pending])));
+        $this->assertFalse($secretary->can('update', Payment::factory()->create()));
+        $this->assertFalse($secretary->can('validate', Payment::factory()->create()));
         $this->assertTrue($secretary->can('create', CreditNote::class));
         $this->assertFalse($secretary->can('create', Refund::class));
         $this->assertFalse($secretary->can('approve', Refund::factory()->create(['status' => RefundStatus::Pending])));
@@ -103,6 +114,8 @@ class BillingPolicyTest extends TestCase
         $this->assertTrue($accountant->can('download', Invoice::factory()->create()));
         $this->assertFalse($accountant->can('create', Payment::class));
         $this->assertTrue($accountant->can('viewAny', Payment::class));
+        $this->assertFalse($accountant->can('update', Payment::factory()->create(['status' => PaymentStatus::Pending])));
+        $this->assertFalse($accountant->can('validate', Payment::factory()->create(['status' => PaymentStatus::Pending])));
         $this->assertTrue($accountant->can('create', Refund::class));
         $this->assertTrue($accountant->can('approve', Refund::factory()->create(['status' => RefundStatus::Pending])));
         $this->assertTrue($accountant->can('reject', Refund::factory()->create(['status' => RefundStatus::Pending])));

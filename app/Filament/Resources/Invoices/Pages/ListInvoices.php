@@ -3,12 +3,21 @@
 namespace App\Filament\Resources\Invoices\Pages;
 
 use App\Filament\Resources\Invoices\InvoiceResource;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 
 class ListInvoices extends ListRecords
 {
     protected static string $resource = InvoiceResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CreateAction::make()
+                ->label('+ Ajouter une facture'),
+        ];
+    }
 
     public function getTabs(): array
     {

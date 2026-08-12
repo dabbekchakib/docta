@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CreditNotes\Pages;
 
+use App\Filament\Resources\CreditNotes\Actions\CreateCreditNoteHeaderAction;
 use App\Filament\Resources\CreditNotes\CreditNoteResource;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -9,6 +10,13 @@ use Filament\Schemas\Components\Tabs\Tab;
 class ListCreditNotes extends ListRecords
 {
     protected static string $resource = CreditNoteResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CreateCreditNoteHeaderAction::make(),
+        ];
+    }
 
     public function getTabs(): array
     {

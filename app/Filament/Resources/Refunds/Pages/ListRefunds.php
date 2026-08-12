@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Refunds\Pages;
 
+use App\Filament\Resources\Refunds\Actions\CreateRefundHeaderAction;
 use App\Filament\Resources\Refunds\RefundResource;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -9,6 +10,13 @@ use Filament\Schemas\Components\Tabs\Tab;
 class ListRefunds extends ListRecords
 {
     protected static string $resource = RefundResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CreateRefundHeaderAction::make(),
+        ];
+    }
 
     public function getTabs(): array
     {

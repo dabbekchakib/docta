@@ -32,7 +32,7 @@ class RequestRefundAction extends Action
                     ->required()
                     ->minValue(0.001)
                     ->prefix('DT')
-                    ->default(fn (Action $action): string => $action->getRecord()->amount > 0
+                    ->default(fn (Action $action): string => ($action->getRecord()?->amount ?? 0) > 0
                         ? number_format((float) $action->getRecord()->amount, 3, '.', '')
                         : '0.000'),
                 DatePicker::make('refund_date')

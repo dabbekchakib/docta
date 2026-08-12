@@ -18,13 +18,13 @@ class RecordPaymentAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'recordPayment')
-            ->label('Encaisser')
+            ->label('Ajouter un paiement')
             ->icon(Heroicon::OutlinedBanknotes)
             ->color('primary')
             ->authorize('create', \App\Models\Payment::class)
             ->visible(fn (Action $action): bool => self::canRecord($action))
-            ->modalHeading('Encaisser un paiement')
-            ->modalDescription('Un reçu (REC-…) sera automatiquement émis. Le montant est plafonné au restant dû.')
+            ->modalHeading('Ajouter un paiement')
+            ->modalDescription('Le paiement est encaissé immédiatement et un reçu (REC-…) est émis automatiquement. Le montant est plafonné au restant dû.')
             ->form([
                 TextInput::make('amount')
                     ->label('Montant (TND)')

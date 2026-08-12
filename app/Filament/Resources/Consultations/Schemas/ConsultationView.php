@@ -162,7 +162,7 @@ class ConsultationView
                                     ->schema([
                                         TextEntry::make('created_at')->label('Date'),
                                         TextEntry::make('description')->label('Action'),
-                                        TextEntry::make('causer')->label('Utilisateur'),
+                                        TextEntry::make('causer.name')->label('Utilisateur'),
                                     ])
                                     ->columns(3),
                             ]),

@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\Payments\Pages;
 
+use App\Enums\PaymentStatus;
 use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Filament\Resources\Payments\Actions\CancelPaymentAction;
 use App\Filament\Resources\Payments\Actions\DownloadPaymentReceiptAction;
 use App\Filament\Resources\Payments\Actions\RequestRefundAction;
+use App\Filament\Resources\Payments\Actions\ValidatePaymentAction;
 use App\Filament\Resources\Payments\PaymentResource;
-use App\Filament\Resources\Payments\Schemas\PaymentView;
+use App\Filament\Resources\Receipts\ReceiptResource;
 use App\Models\Payment;
 use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\View\View;
@@ -50,6 +53,18 @@ class ViewPayment extends ViewRecord
                 ->color('gray')
                 ->visible(fn (): bool => $this->record instanceof Payment && $this->record->invoice)
                 ->url(fn (): string => InvoiceResource::getUrl('view', ['record' => $this->record->invoice])),
+            Action::make('viewReceipt')
+                ->label('Voir le reçu')
+                ->icon(Heroicon::OutlinedReceiptRefund)
+                ->color('gray')
+                ->visible(fn (): bool => $this->record instanceof Payment && $this->record->receipt)
+                ->url(fn (): string => ReceiptResource::getUrl('view', ['record' => $this->record->receipt])),
+            EditAction::make()
+                ->label('Modifier')
+                ->visible(fn (): bool => $this->record instanceof Payment
+                    && $this->record->status === PaymentStatus::Pending
+                    && (auth()->user()?->can('update', $this->record) ?? false)),
+            ValidatePaymentAction::make(),
             DownloadPaymentReceiptAction::make(),
             RequestRefundAction::make(),
             CancelPaymentAction::make(),

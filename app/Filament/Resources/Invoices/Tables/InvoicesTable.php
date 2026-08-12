@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\Invoices\Tables;
 
 use App\Enums\InvoiceStatus;
+use App\Filament\Resources\CreditNotes\Actions\CreateCreditNoteAction;
 use App\Filament\Resources\Invoices\Actions\CancelInvoiceAction;
 use App\Filament\Resources\Invoices\Actions\DownloadInvoiceAction;
 use App\Filament\Resources\Invoices\Actions\IssueInvoiceAction;
 use App\Filament\Resources\Invoices\Actions\RecordPaymentAction;
+use App\Filament\Resources\Invoices\Actions\ViewPaymentsAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -80,8 +83,15 @@ class InvoicesTable
             ])
             ->recordActions([
                 ViewAction::make(),
+                EditAction::make()
+                    ->label('Modifier')
+                    ->visible(fn ($record): bool => $record instanceof \App\Models\Invoice
+                        && $record->status === InvoiceStatus::Draft
+                        && (auth()->user()?->can('update', $record) ?? false)),
                 IssueInvoiceAction::make(),
                 RecordPaymentAction::make(),
+                ViewPaymentsAction::make(),
+                CreateCreditNoteAction::make(),
                 DownloadInvoiceAction::make(),
                 CancelInvoiceAction::make(),
             ])

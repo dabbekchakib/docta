@@ -18,6 +18,7 @@ class ServiceForm
             ->schema([
                 Section::make('Prestation')
                     ->description('Tarif facturé au patient, hors taxes de remise.')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('code')
                             ->label('Code')

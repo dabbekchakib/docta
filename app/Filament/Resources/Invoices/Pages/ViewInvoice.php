@@ -2,19 +2,21 @@
 
 namespace App\Filament\Resources\Invoices\Pages;
 
+use App\Enums\InvoiceStatus;
 use App\Filament\Resources\CreditNotes\Actions\CreateCreditNoteAction;
 use App\Filament\Resources\Invoices\Actions\CancelInvoiceAction;
 use App\Filament\Resources\Invoices\Actions\DownloadInvoiceAction;
 use App\Filament\Resources\Invoices\Actions\IssueInvoiceAction;
 use App\Filament\Resources\Invoices\Actions\RecordPaymentAction;
+use App\Filament\Resources\Invoices\Actions\ViewPaymentsAction;
 use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Filament\Resources\Patients\PatientResource;
 use App\Models\Invoice;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Icons\Heroicon;
-use Filament\Actions\Action;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 
@@ -55,13 +57,22 @@ class ViewInvoice extends ViewRecord
                     && $this->record->patient
                     && (auth()->user()?->can('view', $this->record->patient) ?? false))
                 ->url(fn (): string => PatientResource::getUrl('view', ['record' => $this->record->patient])),
+            EditAction::make()
+                ->label('Modifier')
+                ->visible(fn (): bool => $this->record instanceof Invoice
+                    && $this->record->status === InvoiceStatus::Draft
+                    && (auth()->user()?->can('update', $this->record) ?? false)),
             IssueInvoiceAction::make(),
             RecordPaymentAction::make(),
+            ViewPaymentsAction::make(),
             CreateCreditNoteAction::make(),
             DownloadInvoiceAction::make(),
             CancelInvoiceAction::make(),
-            EditAction::make(),
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->label('Supprimer')
+                ->visible(fn (): bool => $this->record instanceof Invoice
+                    && $this->record->status === InvoiceStatus::Draft
+                    && (auth()->user()?->can('delete', $this->record) ?? false)),
         ];
     }
 }

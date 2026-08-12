@@ -14,6 +14,9 @@ class PaymentPolicy
         return $user->hasAnyPermission([
             Permission::PaymentsView->value,
             Permission::PaymentsCreate->value,
+            Permission::PaymentsUpdate->value,
+            Permission::PaymentsValidate->value,
+            Permission::PaymentsCancel->value,
         ]);
     }
 
@@ -31,13 +34,34 @@ class PaymentPolicy
         return $user->hasPermissionTo(Permission::PaymentsCreate->value);
     }
 
+    public function update(User $user, Payment $payment): bool
+    {
+        if (! $user->hasPermissionTo(Permission::PaymentsUpdate->value)) {
+            return false;
+        }
+
+        return $payment->status === PaymentStatus::Pending;
+    }
+
+    public function validate(User $user, Payment $payment): bool
+    {
+        if (! $user->hasPermissionTo(Permission::PaymentsValidate->value)) {
+            return false;
+        }
+
+        return $payment->status === PaymentStatus::Pending;
+    }
+
     public function cancel(User $user, Payment $payment): bool
     {
         if (! $user->hasPermissionTo(Permission::PaymentsCancel->value)) {
             return false;
         }
 
-        return $payment->status === PaymentStatus::Completed;
+        return in_array($payment->status, [
+            PaymentStatus::Pending,
+            PaymentStatus::Completed,
+        ], true);
     }
 
     public function delete(User $user, Payment $payment): bool

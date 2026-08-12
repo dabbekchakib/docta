@@ -97,6 +97,8 @@ class InvoiceForm
                     ->schema([
                         Repeater::make('items')
                             ->label('Prestations facturées')
+                            ->relationship('items')
+                            ->orderColumn('sort_order')
                             ->columnSpanFull()
                             ->defaultItems(1)
                             ->minItems(1)
