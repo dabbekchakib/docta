@@ -18,6 +18,7 @@ class InvoiceItem extends Model
         'description',
         'quantity',
         'unit_price',
+        'line_base',
         'discount_percent',
         'tax_rate',
         'tax_amount',
@@ -30,6 +31,7 @@ class InvoiceItem extends Model
         return [
             'quantity' => 'decimal:3',
             'unit_price' => 'decimal:3',
+            'line_base' => 'decimal:3',
             'discount_percent' => 'decimal:2',
             'tax_rate' => 'decimal:2',
             'tax_amount' => 'decimal:3',

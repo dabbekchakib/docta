@@ -121,7 +121,7 @@ class AppointmentsCalendar extends Page
             ->when($this->doctorId, fn ($query) => $query->where('doctor_id', $this->doctorId))
             ->orderBy('start_time')
             ->get()
-            ->groupBy('appointment_date');
+            ->groupBy(fn (Appointment $appointment): string => $appointment->appointment_date->format('Y-m-d'));
     }
 
     public function isDoctorUser(): bool

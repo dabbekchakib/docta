@@ -15,16 +15,19 @@ use Illuminate\Support\Collection;
  */
 class InvoiceCalculationService
 {
+    public const STAMP_FEE = '1.000';
+
     /**
      * @param  array<int, array{service_id?: int|string|null, description?: string|null, quantity?: string|int|float|null, unit_price?: string|int|float|null, discount_percent?: string|int|float|null, tax_rate?: string|int|float|null}>  $items
      * @return array{
-     *     items: array<int, array{service_id: int|null, description: string, quantity: string, unit_price: string, discount_percent: string, tax_rate: string, tax_amount: string, line_total: string, sort_order: int}>,
+     *     items: array<int, array{service_id: int|null, description: string, quantity: string, unit_price: string, line_base: string, discount_percent: string, tax_rate: string, tax_amount: string, line_total: string, sort_order: int}>,
      *     discount_type: string,
      *     discount_value: string,
      *     subtotal: string,
      *     discount_amount: string,
      *     taxable_base: string,
      *     tax_amount: string,
+     *     stamp_fee: string,
      *     total: string
      * }
      */
@@ -50,6 +53,7 @@ class InvoiceCalculationService
 
             $lineTax = Money::mul($lineBase, Money::div($line['tax_rate'], '100'));
 
+            $line['line_base'] = $lineBase;
             $line['tax_amount'] = $lineTax;
             $line['line_total'] = Money::add($lineBase, $lineTax);
 
@@ -61,7 +65,9 @@ class InvoiceCalculationService
 
         $discountAmount = $this->discountAmount($subtotal, $discountType, $discountValue);
 
-        $total = Money::sub($subtotal, $discountAmount);
+        $totalBeforeStamp = Money::sub($subtotal, $discountAmount);
+        $stampFee = self::STAMP_FEE;
+        $total = Money::add($totalBeforeStamp, $stampFee);
 
         return [
             'items' => $normalizedItems,
@@ -71,6 +77,7 @@ class InvoiceCalculationService
             'discount_amount' => $discountAmount,
             'taxable_base' => $taxableBase,
             'tax_amount' => $taxAmount,
+            'stamp_fee' => $stampFee,
             'total' => $total,
         ];
     }
@@ -103,7 +110,7 @@ class InvoiceCalculationService
      * Normalise les lignes et récupère le prix/la taxe par défaut depuis le tarif.
      *
      * @param  array<int, array<string, mixed>>  $items
-     * @return array<int, array{service_id: int|null, description: string, quantity: string, unit_price: string, discount_percent: string, tax_rate: string, tax_amount: string, line_total: string, sort_order: int}>
+     * @return array<int, array{service_id: int|null, description: string, quantity: string, unit_price: string, line_base: string, discount_percent: string, tax_rate: string, tax_amount: string, line_total: string, sort_order: int}>
      */
     private function normalizeItems(array $items): array
     {
@@ -127,6 +134,7 @@ class InvoiceCalculationService
                 'description' => (string) ($item['description'] ?? $service?->name ?? ''),
                 'quantity' => Money::normalize((string) ($item['quantity'] ?? '1')),
                 'unit_price' => Money::normalize($unitPrice),
+                'line_base' => Money::zero(),
                 'discount_percent' => Money::round2((string) ($item['discount_percent'] ?? '0')),
                 'tax_rate' => Money::round2($taxRate),
                 'tax_amount' => Money::zero(),

@@ -49,6 +49,9 @@ class InvoiceView
                         TextEntry::make('tax_amount')->label('TVA')
                             ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
                             ->alignEnd(),
+                        TextEntry::make('stamp_fee')->label('Timbre fiscal')
+                            ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
+                            ->alignEnd(),
                         TextEntry::make('total')->label('Total à payer')
                             ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
                             ->weight('bold')
@@ -78,9 +81,15 @@ class InvoiceView
                                     ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT'),
                                 TextEntry::make('discount_percent')->label('Remise')
                                     ->formatStateUsing(fn ($state): string => number_format((float) $state, 2, ',', ' ').' %'),
+                                TextEntry::make('line_base')->label('Base HT')
+                                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
+                                    ->alignEnd(),
                                 TextEntry::make('tax_rate')->label('TVA')
                                     ->formatStateUsing(fn ($state): string => number_format((float) $state, 2, ',', ' ').' %'),
-                                TextEntry::make('line_total')->label('Total ligne')
+                                TextEntry::make('tax_amount')->label('Montant TVA')
+                                    ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
+                                    ->alignEnd(),
+                                TextEntry::make('line_total')->label('Total TTC')
                                     ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT')
                                     ->alignEnd()
                                     ->weight('semibold'),

@@ -139,21 +139,38 @@
                             <th>Désignation</th>
                             <th class="num">Qté</th>
                             <th class="num">Prix unitaire</th>
+                            <th class="num">Remise</th>
+                            <th class="num">Base HT</th>
                             <th class="num">TVA</th>
-                            <th class="num">Total HT</th>
+                            <th class="num">Montant TVA</th>
                             <th class="num">Total TTC</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php $totalLineDiscount = 0; @endphp
                         @foreach ($invoice->items as $index => $item)
+                            @php
+                                $baseBrut = (float) $item->quantity * (float) $item->unit_price;
+                                $lineDiscountAmount = $baseBrut - (float) $item->line_base;
+                                $totalLineDiscount += $lineDiscountAmount;
+                            @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->description }}</td>
                                 <td class="num">{{ number_format((float) $item->quantity, 3, ',', ' ') }}</td>
                                 <td class="num">{{ number_format((float) $item->unit_price, 3, ',', ' ') }} {{ $currency }}</td>
+                                <td class="num">
+                                    @if ((float) $item->discount_percent > 0)
+                                        {{ number_format((float) $item->discount_percent, 2, ',', ' ') }} %<br>
+                                        <small>(-{{ number_format($lineDiscountAmount, 3, ',', ' ') }} {{ $currency }})</small>
+                                    @else
+                                        —
+                                    @endif
+                                </td>
+                                <td class="num">{{ number_format((float) $item->line_base, 3, ',', ' ') }} {{ $currency }}</td>
                                 <td class="num">{{ number_format((float) $item->tax_rate, 2, ',', ' ') }} %</td>
+                                <td class="num">{{ number_format((float) $item->tax_amount, 3, ',', ' ') }} {{ $currency }}</td>
                                 <td class="num">{{ number_format((float) $item->line_total, 3, ',', ' ') }} {{ $currency }}</td>
-                                <td class="num">{{ number_format((float) ($item->line_total + $item->tax_amount), 3, ',', ' ') }} {{ $currency }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -161,23 +178,39 @@
                 <div class="totals">
                     <table>
                         <tr>
-                            <td class="label">Sous-total TTC</td>
-                            <td class="num">{{ number_format((float) $invoice->subtotal, 3, ',', ' ') }} {{ $currency }}</td>
+                            <td class="label">Total brut HT</td>
+                            <td class="num">{{ number_format((float) $invoice->taxable_base + $totalLineDiscount, 3, ',', ' ') }} {{ $currency }}</td>
                         </tr>
-                        @if ((float) $invoice->discount_amount > 0)
+                        @if ($totalLineDiscount > 0)
                             <tr>
-                                <td class="label">Remise ({{ $invoice->discount_type === 'percent' ? $invoice->discount_value.' %' : number_format((float) $invoice->discount_value, 3, ',', ' ').' '.$currency }})</td>
-                                <td class="num">- {{ number_format((float) $invoice->discount_amount, 3, ',', ' ') }} {{ $currency }}</td>
+                                <td class="label">Remises lignes</td>
+                                <td class="num">- {{ number_format($totalLineDiscount, 3, ',', ' ') }} {{ $currency }}</td>
                             </tr>
                         @endif
                         <tr>
-                            <td class="label">Base imposable</td>
+                            <td class="label">Sous-total HT</td>
                             <td class="num">{{ number_format((float) $invoice->taxable_base, 3, ',', ' ') }} {{ $currency }}</td>
                         </tr>
                         <tr>
                             <td class="label">TVA</td>
                             <td class="num">{{ number_format((float) $invoice->tax_amount, 3, ',', ' ') }} {{ $currency }}</td>
                         </tr>
+                        <tr>
+                            <td class="label">Sous-total TTC</td>
+                            <td class="num">{{ number_format((float) $invoice->subtotal, 3, ',', ' ') }} {{ $currency }}</td>
+                        </tr>
+                        @if ((float) $invoice->discount_amount > 0)
+                            <tr>
+                                <td class="label">Remise globale ({{ $invoice->discount_type === 'percent' ? $invoice->discount_value.' %' : number_format((float) $invoice->discount_value, 3, ',', ' ').' '.$currency }})</td>
+                                <td class="num">- {{ number_format((float) $invoice->discount_amount, 3, ',', ' ') }} {{ $currency }}</td>
+                            </tr>
+                        @endif
+                        @if ((float) ($invoice->stamp_fee ?? 0) > 0)
+                            <tr>
+                                <td class="label">Timbre fiscal</td>
+                                <td class="num">{{ number_format((float) $invoice->stamp_fee, 3, ',', ' ') }} {{ $currency }}</td>
+                            </tr>
+                        @endif
                         <tr class="total">
                             <td class="label">Total TTC</td>
                             <td class="num">{{ number_format((float) $invoice->total, 3, ',', ' ') }} {{ $currency }}</td>

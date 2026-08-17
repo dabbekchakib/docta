@@ -16,6 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class InvoiceForm
@@ -55,40 +56,41 @@ class InvoiceForm
                             ->required(),
                         Select::make('doctor_id')
                             ->label('Médecin')
-                            ->relationship('doctor', 'full_name')
-                            ->getSearchResultsUsing(fn (Select $component, ?string $search): array => self::searchDoctors($search))
-                            ->getOptionLabelFromRecordUsing(fn (Doctor $record): string => $record->full_name.' — '.$record->speciality?->getLabel())
                             ->searchable()
                             ->preload()
                             ->nullable()
-                            ->default(fn (): ?int => self::defaultDoctorId()),
+                            ->default(fn (): ?int => self::defaultDoctorId())
+                            ->live()
+                            ->options(fn (Select $component): array => self::getFilteredDoctors(null, $component))
+                            ->getSearchResultsUsing(fn (Select $component, ?string $search): array => self::getFilteredDoctors($search, $component))
+                            ->getOptionLabelFromRecordUsing(fn (Doctor $record): string => $record->full_name.' — '.$record->speciality?->getLabel()),
                         Select::make('consultation_id')
                             ->label('Consultation liée')
-                            ->relationship('consultation', 'consultation_number')
-                            ->getSearchResultsUsing(function (Select $component, ?string $search): array {
-                                $patientId = (int) $component->getState();
-
-                                return self::searchConsultations($search, $patientId);
-                            })
-                            ->getOptionLabelFromRecordUsing(fn (Consultation $record): string => $record->consultation_number.' — '.$record->consultation_date?->format('d/m/Y'))
                             ->searchable()
                             ->preload()
-                            ->nullable(),
+                            ->nullable()
+                            ->live()
+                            ->options(fn (Select $component): array => self::getFilteredConsultations(null, $component))
+                            ->getSearchResultsUsing(fn (Select $component, ?string $search): array => self::getFilteredConsultations($search, $component))
+                            ->getOptionLabelFromRecordUsing(fn (Consultation $record): string => $record->consultation_number.' — '.$record->consultation_date?->format('d/m/Y')),
                         Select::make('appointment_id')
                             ->label('Rendez-vous lié')
-                            ->relationship('appointment', 'appointment_number')
-                            ->getOptionLabelFromRecordUsing(fn (Appointment $record): string => $record->appointment_number.' — '.$record->appointment_date?->format('d/m/Y'))
                             ->searchable()
                             ->preload()
-                            ->nullable(),
+                            ->nullable()
+                            ->live()
+                            ->options(fn (Select $component): array => self::getFilteredAppointments(null, $component))
+                            ->getSearchResultsUsing(fn (Select $component, ?string $search): array => self::getFilteredAppointments($search, $component))
+                            ->getOptionLabelFromRecordUsing(fn (Appointment $record): string => $record->appointment_number.' — '.$record->appointment_date?->format('d/m/Y')),
                         Select::make('laboratory_request_id')
                             ->label('Demande d\'examens liée')
-                            ->relationship('laboratoryRequest', 'request_number')
-                            ->getSearchResultsUsing(fn (Select $component, ?string $search): array => self::searchLaboratoryRequests($search))
-                            ->getOptionLabelFromRecordUsing(fn (LaboratoryRequest $record): string => $record->request_number.' — '.$record->patient?->full_name)
                             ->searchable()
                             ->preload()
-                            ->nullable(),
+                            ->nullable()
+                            ->live()
+                            ->options(fn (Select $component): array => self::getFilteredLaboratoryRequests(null, $component))
+                            ->getSearchResultsUsing(fn (Select $component, ?string $search): array => self::getFilteredLaboratoryRequests($search, $component))
+                            ->getOptionLabelFromRecordUsing(fn (LaboratoryRequest $record): string => $record->request_number.' — '.$record->patient?->full_name),
                     ])
                     ->columns(3),
                 Section::make('Lignes de facturation')
@@ -97,18 +99,21 @@ class InvoiceForm
                     ->schema([
                         Repeater::make('items')
                             ->label('Prestations facturées')
-                            ->relationship('items')
-                            ->orderColumn('sort_order')
                             ->columnSpanFull()
                             ->defaultItems(1)
                             ->minItems(1)
                             ->collapsible()
                             ->reorderableWithButtons()
                             ->addActionLabel('Ajouter une prestation')
+                            ->afterStateHydrated(function (Repeater $component, ?Model $record): void {
+                                if ($record && method_exists($record, 'items')) {
+                                    $component->state($record->items->sortBy('sort_order')->values()->toArray());
+                                }
+                            })
                             ->schema([
                                 Select::make('service_id')
                                     ->label('Prestation')
-                                    ->relationship('service', 'name')
+                                    ->options(fn (): array => self::searchServices(null))
                                     ->getSearchResultsUsing(fn (Select $component, ?string $search): array => self::searchServices($search))
                                     ->getOptionLabelFromRecordUsing(fn (Service $record): string => $record->name.' — '.$record->priceLabel())
                                     ->searchable()
@@ -190,6 +195,11 @@ class InvoiceForm
             ]);
     }
 
+    private static function formValue(Select $component, string $key): mixed
+    {
+        return data_get($component->getLivewire(), "data.{$key}");
+    }
+
     /**
      * @return array<int, string>
      */
@@ -213,23 +223,144 @@ class InvoiceForm
     }
 
     /**
+     * Médecins filtrés par les consultations du patient sélectionné.
+     *
      * @return array<int, string>
      */
-    private static function searchDoctors(?string $search): array
+    private static function getFilteredDoctors(?string $search, Select $component): array
     {
-        return Doctor::query()
-            ->where('status', 'active')
-            ->when($search, function ($query, string $search): void {
-                $query->where(function ($query) use ($search): void {
-                    $query->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('doctor_code', 'like', "%{$search}%");
-                });
-            })
-            ->limit(20)
+        $patientId = (int) self::formValue($component, 'patient_id');
+
+        $query = Doctor::query()->where('status', 'active');
+
+        if ($patientId > 0) {
+            $query->whereHas('consultations', function (Builder $q) use ($patientId): void {
+                $q->where('patient_id', $patientId);
+            });
+        }
+
+        if ($search) {
+            $query->where(function (Builder $q) use ($search): void {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('doctor_code', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->limit(50)
             ->get()
             ->mapWithKeys(fn (Doctor $doctor): array => [
                 $doctor->id => $doctor->full_name.' — '.$doctor->speciality?->getLabel(),
+            ])
+            ->all();
+    }
+
+    /**
+     * Consultations filtrées par patient et médecin.
+     *
+     * @return array<int, string>
+     */
+    private static function getFilteredConsultations(?string $search, Select $component): array
+    {
+        $patientId = (int) self::formValue($component, 'patient_id');
+        $doctorId = (int) self::formValue($component, 'doctor_id');
+
+        $query = Consultation::query()->with('patient');
+
+        if ($patientId > 0) {
+            $query->where('patient_id', $patientId);
+        }
+
+        if ($doctorId > 0) {
+            $query->where('doctor_id', $doctorId);
+        }
+
+        if ($search) {
+            $query->where(function (Builder $q) use ($search): void {
+                $q->where('consultation_number', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function (Builder $sub) use ($search): void {
+                        $sub->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        return $query->limit(50)
+            ->get()
+            ->mapWithKeys(fn (Consultation $consultation): array => [
+                $consultation->id => $consultation->consultation_number.' — '.$consultation->patient?->full_name,
+            ])
+            ->all();
+    }
+
+    /**
+     * Rendez-vous filtrés par patient et médecin.
+     *
+     * @return array<int, string>
+     */
+    private static function getFilteredAppointments(?string $search, Select $component): array
+    {
+        $patientId = (int) self::formValue($component, 'patient_id');
+        $doctorId = (int) self::formValue($component, 'doctor_id');
+
+        $query = Appointment::query();
+
+        if ($patientId > 0) {
+            $query->where('patient_id', $patientId);
+        }
+
+        if ($doctorId > 0) {
+            $query->where('doctor_id', $doctorId);
+        }
+
+        if ($search) {
+            $query->where(function (Builder $q) use ($search): void {
+                $q->where('appointment_number', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->limit(50)
+            ->get()
+            ->mapWithKeys(fn (Appointment $appointment): array => [
+                $appointment->id => $appointment->appointment_number.' — '.$appointment->appointment_date?->format('d/m/Y'),
+            ])
+            ->all();
+    }
+
+    /**
+     * Demandes d'examens filtrées par patient et médecin.
+     *
+     * @return array<int, string>
+     */
+    private static function getFilteredLaboratoryRequests(?string $search, Select $component): array
+    {
+        $patientId = (int) self::formValue($component, 'patient_id');
+        $doctorId = (int) self::formValue($component, 'doctor_id');
+
+        $query = LaboratoryRequest::query()->with('patient');
+
+        if ($patientId > 0) {
+            $query->where('patient_id', $patientId);
+        }
+
+        if ($doctorId > 0) {
+            $query->where('doctor_id', $doctorId);
+        }
+
+        if ($search) {
+            $query->where(function (Builder $q) use ($search): void {
+                $q->where('request_number', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function (Builder $sub) use ($search): void {
+                        $sub->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        return $query->limit(50)
+            ->get()
+            ->mapWithKeys(fn (LaboratoryRequest $request): array => [
+                $request->id => $request->request_number.' — '.$request->patient?->full_name,
             ])
             ->all();
     }
@@ -251,55 +382,6 @@ class InvoiceForm
             ->get()
             ->mapWithKeys(fn (Service $service): array => [
                 $service->id => $service->name.' — '.$service->priceLabel(),
-            ])
-            ->all();
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private static function searchConsultations(?string $search, int $patientId): array
-    {
-        return Consultation::query()
-            ->with('patient')
-            ->when($patientId > 0, fn ($query) => $query->where('patient_id', $patientId))
-            ->when($search, function ($query, string $search): void {
-                $query->where(function ($query) use ($search): void {
-                    $query->where('consultation_number', 'like', "%{$search}%")
-                        ->orWhereHas('patient', function ($sub) use ($search): void {
-                            $sub->where('first_name', 'like', "%{$search}%")
-                                ->orWhere('last_name', 'like', "%{$search}%");
-                        });
-                });
-            })
-            ->limit(20)
-            ->get()
-            ->mapWithKeys(fn (Consultation $consultation): array => [
-                $consultation->id => $consultation->consultation_number.' — '.$consultation->patient?->full_name,
-            ])
-            ->all();
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private static function searchLaboratoryRequests(?string $search): array
-    {
-        return LaboratoryRequest::query()
-            ->with('patient')
-            ->when($search, function ($query, string $search): void {
-                $query->where(function ($query) use ($search): void {
-                    $query->where('request_number', 'like', "%{$search}%")
-                        ->orWhereHas('patient', function ($sub) use ($search): void {
-                            $sub->where('first_name', 'like', "%{$search}%")
-                                ->orWhere('last_name', 'like', "%{$search}%");
-                        });
-                });
-            })
-            ->limit(20)
-            ->get()
-            ->mapWithKeys(fn (LaboratoryRequest $request): array => [
-                $request->id => $request->request_number.' — '.$request->patient?->full_name,
             ])
             ->all();
     }
