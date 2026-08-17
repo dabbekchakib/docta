@@ -226,7 +226,23 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::AssistantIaView,
         ]);
         $this->createRole(RoleEnum::Patient, [
-            PermissionEnum::PatientsView,
+            PermissionEnum::PortalViewDashboard,
+            PermissionEnum::PortalViewAppointments,
+            PermissionEnum::PortalCreateAppointments,
+            PermissionEnum::PortalCancelAppointments,
+            PermissionEnum::PortalViewMedicalRecord,
+            PermissionEnum::PortalViewConsultations,
+            PermissionEnum::PortalViewPrescriptions,
+            PermissionEnum::PortalViewLabExams,
+            PermissionEnum::PortalViewDocuments,
+            PermissionEnum::PortalDownloadDocuments,
+            PermissionEnum::PortalViewInvoices,
+            PermissionEnum::PortalDownloadInvoices,
+            PermissionEnum::PortalViewPayments,
+            PermissionEnum::PortalViewNotifications,
+            PermissionEnum::PortalSendMessage,
+            PermissionEnum::PortalUseAi,
+            PermissionEnum::PortalManageProfile,
         ]);
         $this->createRole(RoleEnum::Accountant, [
             PermissionEnum::PatientsView,

@@ -11,6 +11,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -41,6 +42,14 @@ class User extends Authenticatable implements FilamentUser, HasName
      */
     public function canAccessPanel(Panel $panel): bool
     {
+        if (! $this->is_active) {
+            return false;
+        }
+
+        if ($panel->getId() === 'patient') {
+            return $this->hasRole(Role::Patient->value) && $this->patient()->exists();
+        }
+
         return $this->canAccessAdminPanel();
     }
 
@@ -75,5 +84,13 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function isAdmin(): bool
     {
         return $this->hasAnyRole([Role::SuperAdmin->value, Role::Admin->value]);
+    }
+
+    /**
+     * Get the patient record linked to this user.
+     */
+    public function patient(): HasOne
+    {
+        return $this->hasOne(Patient::class);
     }
 }

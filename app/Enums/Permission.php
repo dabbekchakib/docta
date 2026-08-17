@@ -147,6 +147,25 @@ enum Permission: string
     case AssistantIaUse = 'assistant.ia.use';
     case AssistantIaView = 'assistant.ia.view';
 
+    // Patient portal permissions
+    case PortalViewDashboard = 'portal.view_dashboard';
+    case PortalViewAppointments = 'portal.view_appointments';
+    case PortalCreateAppointments = 'portal.create_appointments';
+    case PortalCancelAppointments = 'portal.cancel_appointments';
+    case PortalViewMedicalRecord = 'portal.view_medical_record';
+    case PortalViewConsultations = 'portal.view_consultations';
+    case PortalViewPrescriptions = 'portal.view_prescriptions';
+    case PortalViewLabExams = 'portal.view_lab_exams';
+    case PortalViewDocuments = 'portal.view_documents';
+    case PortalDownloadDocuments = 'portal.download_documents';
+    case PortalViewInvoices = 'portal.view_invoices';
+    case PortalDownloadInvoices = 'portal.download_invoices';
+    case PortalViewPayments = 'portal.view_payments';
+    case PortalViewNotifications = 'portal.view_notifications';
+    case PortalSendMessage = 'portal.send_message';
+    case PortalUseAi = 'portal.use_ai';
+    case PortalManageProfile = 'portal.manage_profile';
+
     public function label(): string
     {
         return match ($this) {
@@ -266,6 +285,23 @@ enum Permission: string
             self::ReportsView => 'Consulter les rapports',
             self::AssistantIaUse => 'Utiliser l\'assistant IA',
             self::AssistantIaView => 'Voir l\'assistant IA',
+            self::PortalViewDashboard => 'Voir le tableau de bord',
+            self::PortalViewAppointments => 'Voir mes rendez-vous',
+            self::PortalCreateAppointments => 'Créer des rendez-vous',
+            self::PortalCancelAppointments => 'Annuler des rendez-vous',
+            self::PortalViewMedicalRecord => 'Voir mon dossier médical',
+            self::PortalViewConsultations => 'Voir mes consultations',
+            self::PortalViewPrescriptions => 'Voir mes ordonnances',
+            self::PortalViewLabExams => 'Voir mes examens',
+            self::PortalViewDocuments => 'Voir mes documents',
+            self::PortalDownloadDocuments => 'Télécharger mes documents',
+            self::PortalViewInvoices => 'Voir mes factures',
+            self::PortalDownloadInvoices => 'Télécharger mes factures',
+            self::PortalViewPayments => 'Voir mes paiements',
+            self::PortalViewNotifications => 'Voir mes notifications',
+            self::PortalSendMessage => 'Envoyer des messages',
+            self::PortalUseAi => 'Utiliser l\'assistant IA',
+            self::PortalManageProfile => 'Gérer mon profil',
         };
     }
 }

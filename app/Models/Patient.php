@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -27,6 +28,7 @@ class Patient extends Model
     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'patient_number',
         'title',
         'first_name',
@@ -88,6 +90,14 @@ class Patient extends Model
     public function age(): Attribute
     {
         return Attribute::get(fn (): ?int => $this->birth_date?->age);
+    }
+
+    /**
+     * Utilisateur associé au patient (portail patient).
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

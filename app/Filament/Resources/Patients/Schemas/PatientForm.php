@@ -8,7 +8,10 @@ use App\Enums\PatientGender;
 use App\Enums\PatientStatus;
 use App\Enums\PatientTitle;
 use App\Enums\RelationType;
+use App\Enums\Role;
 use App\Models\Patient;
+use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
@@ -242,6 +245,50 @@ class PatientForm
                                             ->required(),
                                     ])
                                     ->columns(1),
+                            ]),
+                        Tab::make('Compte utilisateur')
+                            ->schema([
+                                Section::make('Compte utilisateur')
+                                    ->description('Lier le patient à un compte utilisateur pour accès au portail patient. Le rôle « Patient » est attribué automatiquement.')
+                                    ->schema([
+                                        Select::make('user_id')
+                                            ->label('Utilisateur')
+                                            ->relationship('user', 'name')
+                                            ->searchable(['name', 'email'])
+                                            ->preload()
+                                            ->createOptionForm([
+                                                TextInput::make('name')
+                                                    ->label('Nom complet')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                TextInput::make('email')
+                                                    ->label('Adresse email')
+                                                    ->email()
+                                                    ->required()
+                                                    ->unique('users', 'email')
+                                                    ->maxLength(255),
+                                                TextInput::make('password')
+                                                    ->label('Mot de passe')
+                                                    ->password()
+                                                    ->revealable()
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->createOptionAction(fn (Action $action) => $action->label('Créer un compte utilisateur'))
+                                            ->createOptionUsing(function (array $data, Select $component): int {
+                                                $user = User::create([
+                                                    'name' => $data['name'],
+                                                    'email' => $data['email'],
+                                                    'password' => $data['password'],
+                                                    'email_verified_at' => now(),
+                                                ]);
+
+                                                $user->assignRole(Role::Patient->value);
+
+                                                return $user->getKey();
+                                            })
+                                            ->helperText('Sélectionnez un compte existant ou créez-en un nouveau. Le patient pourra ensuite se connecter au portail à l\'adresse /patient/login.'),
+                                    ]),
                             ]),
                     ]),
             ]);
