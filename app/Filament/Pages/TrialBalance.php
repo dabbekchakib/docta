@@ -15,11 +15,11 @@ class TrialBalance extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Comptabilité';
+    protected static string|\UnitEnum|null $navigationGroup = 'Rapports et tableaux de bord';
 
     protected static ?string $navigationLabel = 'Balance de vérification';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 6;
 
     public ?string $from = null;
 

@@ -22,7 +22,7 @@ class AppointmentsCalendar extends Page
 
     protected static ?string $navigationLabel = 'Agenda';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public string $currentDate;
 

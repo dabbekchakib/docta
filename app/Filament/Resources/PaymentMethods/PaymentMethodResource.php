@@ -18,7 +18,7 @@ class PaymentMethodResource extends Resource
 {
     protected static ?string $model = PaymentMethod::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Configuration';
+    protected static string|\UnitEnum|null $navigationGroup = 'Paramètres';
 
     protected static ?string $navigationLabel = 'Moyens de paiement';
 

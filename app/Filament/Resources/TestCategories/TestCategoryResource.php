@@ -28,7 +28,7 @@ class TestCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'catégories d\'examens';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -21,13 +21,13 @@ class GeneralLedger extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedListBullet;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Comptabilité';
+    protected static string|\UnitEnum|null $navigationGroup = 'Rapports et tableaux de bord';
 
     protected static ?string $navigationLabel = 'Grand livre';
 
     protected static ?string $title = 'Grand livre';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     public ?int $accountId = null;
 

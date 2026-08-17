@@ -18,7 +18,7 @@ class TaxRateResource extends Resource
 {
     protected static ?string $model = TaxRate::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Configuration';
+    protected static string|\UnitEnum|null $navigationGroup = 'Paramètres';
 
     protected static ?string $navigationLabel = 'Taux de taxe';
 

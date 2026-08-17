@@ -40,9 +40,11 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth(Width::Full)
             ->navigationGroups([
-                'Administration',
+                'Médical',
                 'Gestion',
                 'Facturation',
+                'Rapports et tableaux de bord',
+                'Administration',
                 'Comptabilité',
                 'Paramètres',
             ])

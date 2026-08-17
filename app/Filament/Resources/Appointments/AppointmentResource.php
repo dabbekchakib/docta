@@ -24,7 +24,7 @@ class AppointmentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Gestion';
+    protected static string|\UnitEnum|null $navigationGroup = 'Médical';
 
     protected static ?string $navigationLabel = 'Rendez-vous';
 
@@ -32,7 +32,7 @@ class AppointmentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'rendez-vous';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'appointment_number';
 

@@ -30,7 +30,7 @@ class LaboratoryTestResource extends Resource
 
     protected static ?string $pluralModelLabel = 'examens de laboratoire';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'name';
 

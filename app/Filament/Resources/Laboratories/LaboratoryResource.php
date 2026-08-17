@@ -28,7 +28,7 @@ class LaboratoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'laboratoires';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'name';
 

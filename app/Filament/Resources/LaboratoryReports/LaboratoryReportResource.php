@@ -29,7 +29,7 @@ class LaboratoryReportResource extends Resource
 
     protected static ?string $pluralModelLabel = 'comptes rendus de laboratoire';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $recordTitleAttribute = 'report_number';
 

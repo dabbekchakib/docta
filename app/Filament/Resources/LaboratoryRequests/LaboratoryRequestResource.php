@@ -34,7 +34,7 @@ class LaboratoryRequestResource extends Resource
 
     protected static ?string $pluralModelLabel = 'demandes d\'examens';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'request_number';
 

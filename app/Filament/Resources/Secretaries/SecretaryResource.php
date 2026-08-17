@@ -30,7 +30,7 @@ class SecretaryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'secrétaires';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'full_name';
 

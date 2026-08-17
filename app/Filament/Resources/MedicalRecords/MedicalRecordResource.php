@@ -41,7 +41,7 @@ class MedicalRecordResource extends Resource
 
     protected static ?string $pluralModelLabel = 'dossiers médicaux';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'medical_record_number';
 

@@ -16,11 +16,11 @@ class FinancialReports extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPresentationChartLine;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Facturation';
+    protected static string|\UnitEnum|null $navigationGroup = 'Rapports et tableaux de bord';
 
-    protected static ?string $navigationLabel = 'Rapports financiers';
+    protected static ?string $navigationLabel = 'Rapport financier';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 4;
 
     public ?string $reportDate = null;
 

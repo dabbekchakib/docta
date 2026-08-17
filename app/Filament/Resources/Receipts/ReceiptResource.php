@@ -28,7 +28,7 @@ class ReceiptResource extends Resource
 
     protected static ?string $pluralModelLabel = 'reçus';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'receipt_number';
 
