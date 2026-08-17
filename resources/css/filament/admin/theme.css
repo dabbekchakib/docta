@@ -2,3 +2,8 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/livewire/**/*';
+
+[x-cloak] {
+    display: none !important;
+}

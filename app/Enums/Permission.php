@@ -144,6 +144,9 @@ enum Permission: string
 
     case ReportsView = 'reports.view';
 
+    case AssistantIaUse = 'assistant.ia.use';
+    case AssistantIaView = 'assistant.ia.view';
+
     public function label(): string
     {
         return match ($this) {
@@ -261,6 +264,8 @@ enum Permission: string
             self::AccountingAccountsManage => 'Gérer le plan comptable',
             self::BillingManage => 'Gérer la facturation',
             self::ReportsView => 'Consulter les rapports',
+            self::AssistantIaUse => 'Utiliser l\'assistant IA',
+            self::AssistantIaView => 'Voir l\'assistant IA',
         };
     }
 }

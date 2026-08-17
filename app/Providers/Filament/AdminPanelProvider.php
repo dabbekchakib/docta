@@ -17,6 +17,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Filament\View\PanelsRenderHook;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -40,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth(Width::Full)
             ->navigationGroups([
+                'Assistant IA',
                 'Médical',
                 'Gestion',
                 'Facturation',
@@ -70,6 +72,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn () => view('filament.components.ai-chat-bubble-global')->render(),
+            );
     }
 }

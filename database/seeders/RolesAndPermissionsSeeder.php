@@ -132,6 +132,8 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::AccountingCancel,
             PermissionEnum::AccountingAccountsManage,
             PermissionEnum::ReportsView,
+            PermissionEnum::AssistantIaUse,
+            PermissionEnum::AssistantIaView,
         ]);
         $this->createRole(RoleEnum::Doctor, [
             PermissionEnum::PatientsView,
@@ -179,6 +181,8 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::ReceiptsView,
             PermissionEnum::ReceiptsDownload,
             PermissionEnum::CreditNotesView,
+            PermissionEnum::AssistantIaUse,
+            PermissionEnum::AssistantIaView,
         ]);
         $this->createRole(RoleEnum::Secretary, [
             PermissionEnum::PatientsView,
@@ -218,6 +222,8 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::CreditNotesView,
             PermissionEnum::CreditNotesCreate,
             PermissionEnum::FinancialReportsView,
+            PermissionEnum::AssistantIaUse,
+            PermissionEnum::AssistantIaView,
         ]);
         $this->createRole(RoleEnum::Patient, [
             PermissionEnum::PatientsView,
