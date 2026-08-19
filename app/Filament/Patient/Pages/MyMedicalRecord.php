@@ -5,20 +5,21 @@ namespace App\Filament\Patient\Pages;
 use App\Filament\Patient\Pages\Concerns\HasPatient;
 use App\Models\MedicalRecord;
 use BackedEnum;
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
-use Filament\Infolists\Contracts\HasInfolists;
-use Filament\Infolists\Infolist;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 
-class MyMedicalRecord extends Page implements HasInfolists
+class MyMedicalRecord extends Page
 {
     use HasPatient, InteractsWithInfolists;
 
     protected string $view = 'filament.patient.pages.my-medical-record';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-folder';
+
+    protected static ?string $navigationLabel = 'Mon dossier médical';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Mes soins';
 
@@ -42,12 +43,13 @@ class MyMedicalRecord extends Page implements HasInfolists
         $this->medicalRecord = $patient->medicalRecord;
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function content(Schema $schema): Schema
     {
         $patient = $this->getPatient();
-        $record = $this->medicalRecord;
+        $record = $this->medicalRecord ??= $this->loadMedicalRecord();
 
-        return $infolist
+        return $schema
+            ->record($record)
             ->schema([
                 Section::make('Informations générales')
                     ->icon('heroicon-m-heart')
@@ -113,5 +115,16 @@ class MyMedicalRecord extends Page implements HasInfolists
                             ->placeholder('Aucune note'),
                     ]),
             ]);
+    }
+
+    private function loadMedicalRecord(): ?MedicalRecord
+    {
+        $patient = $this->getPatient();
+
+        if (! $patient) {
+            return null;
+        }
+
+        return $patient->medicalRecord;
     }
 }

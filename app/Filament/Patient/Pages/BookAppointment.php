@@ -10,14 +10,14 @@ use App\Services\AppointmentService;
 use BackedEnum;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Pages\Page;
 
 class BookAppointment extends Page implements HasForms
@@ -27,6 +27,8 @@ class BookAppointment extends Page implements HasForms
     protected string $view = 'filament.patient.pages.book-appointment';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-plus-circle';
+
+    protected static ?string $navigationLabel = 'Prendre rendez-vous';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Mes soins';
 
@@ -52,9 +54,9 @@ class BookAppointment extends Page implements HasForms
         ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make('Nouveau rendez-vous')
                     ->icon('heroicon-m-calendar-days')

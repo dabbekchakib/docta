@@ -22,6 +22,8 @@ class MyDocuments extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-document-duplicate';
 
+    protected static ?string $navigationLabel = 'Mes documents';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mes documents';
 
     protected static ?int $navigationSort = 3;
@@ -98,9 +100,8 @@ class MyDocuments extends Page implements HasTable
         $patient = $this->getPatient();
 
         if (! $patient) {
-            return DB::table('medical_documents')
-                ->whereRaw('0 = 1')
-                ->whereRaw('1 = 0');
+            return \App\Models\MedicalDocument::query()
+                ->whereRaw('0 = 1');
         }
 
         $medicalRecord = $patient->medicalRecord;
@@ -151,7 +152,10 @@ class MyDocuments extends Page implements HasTable
 
         $query = $medicalDocs->unionAll($consultationDocs)->unionAll($labDocs);
 
-        return DB::table(DB::raw("({$query->toSql()}) as documents"))
+        return \App\Models\MedicalDocument::query()
+            ->withoutGlobalScopes()
+            ->select(DB::raw('documents.*'))
+            ->from(DB::raw("({$query->toSql()}) as documents"))
             ->setBindings($query->getBindings());
     }
 }

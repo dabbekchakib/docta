@@ -22,6 +22,8 @@ class MyPrescriptions extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
+    protected static ?string $navigationLabel = 'Mes ordonnances';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mes soins';
 
     protected static ?int $navigationSort = 2;

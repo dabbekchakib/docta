@@ -62,13 +62,14 @@ class ViewPrescription extends Page
                 ->label('Télécharger PDF')
                 ->icon(Heroicon::OutlinedArrowDownTray)
                 ->color('primary')
-                ->action(fn () => app(PrescriptionPdfService::class)->download($this->prescription)),
+                ->action(fn () => app(PrescriptionPdfService::class)->download($this->prescription ??= $this->loadPrescription())),
         ];
     }
 
-    public function infolist(Schema $schema): Schema
+    public function content(Schema $schema): Schema
     {
         return $schema
+            ->record($this->prescription ??= $this->loadPrescription())
             ->schema([
                 Section::make('Informations de l\'ordonnance')
                     ->schema([
@@ -112,12 +113,22 @@ class ViewPrescription extends Page
                             ->columns(5),
                     ]),
                 Section::make('Notes')
-                    ->visible(fn (): bool => filled($this->prescription?->notes))
+                    ->visible(fn (): bool => filled(($this->prescription ??= $this->loadPrescription())?->notes))
                     ->schema([
                         TextEntry::make('notes')
                             ->label('Notes')
                             ->columnSpanFull(),
                     ]),
             ]);
+    }
+
+    private function loadPrescription(): Prescription
+    {
+        $patient = $this->getPatient();
+
+        return Prescription::with(['doctor', 'items'])
+            ->where('id', $this->prescriptionId)
+            ->where('patient_id', $patient->id)
+            ->firstOrFail();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Patient\Widgets;
 
 use App\Models\Patient;
+use App\Models\Prescription;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -42,7 +43,8 @@ class RecentPrescriptionsWidget extends TableWidget
             return \App\Models\Prescription::query()->whereRaw('0 = 1');
         }
 
-        return $patient->prescriptions()
+        return Prescription::query()
+            ->where('patient_id', $patient->id)
             ->with('doctor')
             ->latest('prescription_date')
             ->limit(5);

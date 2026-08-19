@@ -2,6 +2,7 @@
 
 namespace App\Filament\Patient\Widgets;
 
+use App\Models\Consultation;
 use App\Models\Patient;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -45,7 +46,8 @@ class RecentConsultationsWidget extends TableWidget
             return \App\Models\Consultation::query()->whereRaw('0 = 1');
         }
 
-        return $patient->consultations()
+        return Consultation::query()
+            ->where('patient_id', $patient->id)
             ->with('doctor')
             ->latest('consultation_date')
             ->limit(5);

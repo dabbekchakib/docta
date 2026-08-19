@@ -4,23 +4,24 @@ namespace App\Filament\Patient\Pages;
 
 use App\Filament\Patient\Pages\Concerns\HasPatient;
 use App\Models\Receipt;
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
-use Filament\Infolists\Contracts\HasInfolists;
-use Filament\Infolists\Infolist;
 use Filament\Pages\Page;
 use Filament\Panel;
+use Filament\Schemas\Schema;
 
 use BackedEnum;
 
-class ViewReceipt extends Page implements HasInfolists
+class ViewReceipt extends Page
 {
     use HasPatient, InteractsWithInfolists;
 
     protected string $view = 'filament.patient.pages.view-receipt';
 
     protected static BackedEnum|string|null $navigationIcon = null;
+
+    public ?int $receiptId = null;
 
     protected ?Receipt $receipt = null;
 
@@ -31,6 +32,8 @@ class ViewReceipt extends Page implements HasInfolists
 
     public function mount(int $receiptId): void
     {
+        $this->receiptId = $receiptId;
+
         $patient = $this->getPatient();
 
         if (! $patient) {
@@ -53,11 +56,12 @@ class ViewReceipt extends Page implements HasInfolists
         return false;
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function content(Schema $schema): Schema
     {
-        $receipt = $this->receipt;
+        $receipt = $this->receipt ??= $this->loadReceipt();
 
-        return $infolist
+        return $schema
+            ->record($receipt)
             ->schema([
                 Section::make('Informations du reçu')
                     ->icon('heroicon-m-document-text')
@@ -124,5 +128,15 @@ class ViewReceipt extends Page implements HasInfolists
                             ->label('Email'),
                     ]),
             ]);
+    }
+
+    private function loadReceipt(): Receipt
+    {
+        $patient = $this->getPatient();
+
+        return Receipt::with(['payment.paymentMethod', 'invoice', 'patient'])
+            ->where('id', $this->receiptId)
+            ->where('patient_id', $patient->id)
+            ->firstOrFail();
     }
 }

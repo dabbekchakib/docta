@@ -21,6 +21,8 @@ class MyPayments extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-banknotes';
 
+    protected static ?string $navigationLabel = 'Mes paiements';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mes documents';
 
     protected static ?int $navigationSort = 2;

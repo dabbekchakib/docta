@@ -23,6 +23,8 @@ class MyInvoices extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-receipt-percent';
 
+    protected static ?string $navigationLabel = 'Mes factures';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mes documents';
 
     protected static ?int $navigationSort = 1;

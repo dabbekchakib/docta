@@ -7,3 +7,21 @@
 [x-cloak] {
     display: none !important;
 }
+
+.fi-header-actions-ctn {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+}
+
+.fi-header-actions-ctn > * {
+    flex: 1 1 0% !important;
+    min-width: 0;
+}
+
+.fi-header-actions-ctn .fi-btn,
+.fi-header-actions-ctn .fi-dropdown {
+    flex: 1 1 0% !important;
+}

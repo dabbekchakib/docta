@@ -4,24 +4,30 @@ namespace App\Filament\Patient\Pages;
 
 use App\Filament\Patient\Pages\Concerns\HasPatient;
 use App\Models\Invoice;
-use Filament\Infolists\Components\Section;
+use App\Services\InvoicePdfService;
+use App\Services\SettingsService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Section;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\TableEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
-use Filament\Infolists\Contracts\HasInfolists;
-use Filament\Infolists\Infolist;
 use Filament\Pages\Page;
 use Filament\Panel;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 use BackedEnum;
 
-class ViewInvoice extends Page implements HasInfolists
+class ViewInvoice extends Page
 {
     use HasPatient, InteractsWithInfolists;
 
     protected string $view = 'filament.patient.pages.view-invoice';
 
     protected static BackedEnum|string|null $navigationIcon = null;
+
+    public ?int $invoiceId = null;
 
     protected ?Invoice $invoice = null;
 
@@ -32,6 +38,8 @@ class ViewInvoice extends Page implements HasInfolists
 
     public function mount(int $invoiceId): void
     {
+        $this->invoiceId = $invoiceId;
+
         $patient = $this->getPatient();
 
         if (! $patient) {
@@ -54,11 +62,38 @@ class ViewInvoice extends Page implements HasInfolists
         return false;
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    protected function getHeaderActions(): array
     {
-        $invoice = $this->invoice;
+        return [
+            Action::make('downloadPdf')
+                ->label('Télécharger PDF')
+                ->icon(Heroicon::OutlinedArrowDownTray)
+                ->color('primary')
+                ->action(function (): void {
+                    $invoice = Invoice::with(['items', 'payments', 'patient'])
+                        ->where('id', $this->invoiceId)
+                        ->where('patient_id', $this->getPatient()?->id)
+                        ->firstOrFail();
 
-        return $infolist
+                    $pdf = Pdf::loadView('pdf.invoice', [
+                        'invoice' => $invoice,
+                        'cabinet' => app(\App\Services\SettingsService::class)->cabinet(),
+                    ])->setPaper('a4', 'portrait');
+
+                    $filename = 'facture-'.$invoice->invoice_number.'.pdf';
+                    $base64 = base64_encode($pdf->output());
+
+                    $this->dispatch('downloadPdf', filename: $filename, content: $base64);
+                }),
+        ];
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        $invoice = $this->invoice ??= $this->loadInvoice();
+
+        return $schema
+            ->record($invoice)
             ->schema([
                 Section::make('Informations de la facture')
                     ->icon('heroicon-m-document-text')
@@ -80,7 +115,7 @@ class ViewInvoice extends Page implements HasInfolists
                 Section::make('Détails')
                     ->icon('heroicon-m-list-bullet')
                     ->schema([
-                        TableEntry::make('items')
+                        RepeatableEntry::make('items')
                             ->label('Lignes de facture')
                             ->schema([
                                 TextEntry::make('description')
@@ -95,12 +130,7 @@ class ViewInvoice extends Page implements HasInfolists
                                     ->label('Total')
                                     ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT'),
                             ])
-                            ->columnsWithLabels([
-                                'description' => 'Description',
-                                'quantity' => 'Qté',
-                                'unit_price' => 'Prix unitaire',
-                                'line_total' => 'Total',
-                            ]),
+                            ->columns(4),
                     ]),
 
                 Section::make('Totaux')
@@ -131,7 +161,7 @@ class ViewInvoice extends Page implements HasInfolists
                 Section::make('Paiements')
                     ->icon('heroicon-m-banknotes')
                     ->schema([
-                        TableEntry::make('payments')
+                        RepeatableEntry::make('payments')
                             ->label('Paiements effectués')
                             ->schema([
                                 TextEntry::make('payment_date')
@@ -141,10 +171,7 @@ class ViewInvoice extends Page implements HasInfolists
                                     ->label('Montant')
                                     ->formatStateUsing(fn ($state): string => number_format((float) $state, 3, ',', ' ').' DT'),
                             ])
-                            ->columnsWithLabels([
-                                'payment_date' => 'Date',
-                                'amount' => 'Montant',
-                            ])
+                            ->columns(2)
                             ->placeholder('Aucun paiement enregistré'),
                     ]),
 
@@ -158,5 +185,19 @@ class ViewInvoice extends Page implements HasInfolists
                             ->weight('bold'),
                     ]),
             ]);
+    }
+
+    private function loadInvoice(): ?Invoice
+    {
+        $patient = $this->getPatient();
+
+        if (! $patient || ! $this->invoiceId) {
+            return null;
+        }
+
+        return Invoice::with(['items', 'payments', 'patient'])
+            ->where('id', $this->invoiceId)
+            ->where('patient_id', $patient->id)
+            ->firstOrFail();
     }
 }

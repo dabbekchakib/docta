@@ -4,15 +4,15 @@ namespace App\Filament\Patient\Pages;
 
 use App\Filament\Patient\Pages\Concerns\HasPatient;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
@@ -23,6 +23,8 @@ class Profile extends Page implements HasForms
     protected string $view = 'filament.patient.pages.profile';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-user';
+
+    protected static ?string $navigationLabel = 'Mon profil';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Mon compte';
 
@@ -58,9 +60,9 @@ class Profile extends Page implements HasForms
         ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('profil-tabs')
                     ->schema([

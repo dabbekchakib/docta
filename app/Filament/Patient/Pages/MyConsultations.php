@@ -23,6 +23,8 @@ class MyConsultations extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
+    protected static ?string $navigationLabel = 'Mes consultations';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mes soins';
 
     protected static ?int $navigationSort = 1;

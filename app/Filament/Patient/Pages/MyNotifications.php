@@ -21,6 +21,8 @@ class MyNotifications extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-bell';
 
+    protected static ?string $navigationLabel = 'Mes notifications';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mon compte';
 
     protected static ?int $navigationSort = 10;
@@ -36,7 +38,7 @@ class MyNotifications extends Page implements HasTable
             ->query(
                 fn (): Builder => Auth::user()
                     ?->notifications()
-                    ->query()
+                    ->getQuery()
                     ->latest('created_at')
                 ?? \App\Models\User::query()->whereRaw('0 = 1')
             )

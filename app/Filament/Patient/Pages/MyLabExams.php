@@ -23,6 +23,8 @@ class MyLabExams extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
 
+    protected static ?string $navigationLabel = 'Mes examens';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mes soins';
 
     protected static ?int $navigationSort = 3;

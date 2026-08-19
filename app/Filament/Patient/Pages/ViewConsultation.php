@@ -52,9 +52,10 @@ class ViewConsultation extends Page
         return false;
     }
 
-    public function infolist(Schema $schema): Schema
+    public function content(Schema $schema): Schema
     {
         return $schema
+            ->record($this->consultation ??= $this->loadConsultation())
             ->schema([
                 Section::make('Informations de la consultation')
                     ->schema([
@@ -109,7 +110,7 @@ class ViewConsultation extends Page
                             ->columnSpanFull(),
                     ]),
                 Section::make('Constantes vitales')
-                    ->visible(fn (): bool => $this->consultation?->vitalSign !== null)
+                    ->visible(fn (): bool => ($this->consultation ??= $this->loadConsultation())?->vitalSign !== null)
                     ->schema([
                         TextEntry::make('vitalSign.temperature')
                             ->label('Température')
@@ -138,7 +139,7 @@ class ViewConsultation extends Page
                     ])
                     ->columns(4),
                 Section::make('Documents')
-                    ->visible(fn (): bool => $this->consultation?->getMedia('consultation_documents')->isNotEmpty())
+                    ->visible(fn (): bool => ($this->consultation ??= $this->loadConsultation())?->getMedia('consultation_documents')->isNotEmpty())
                     ->schema([
                         RepeatableEntry::make('consultation_documents')
                             ->label('Documents joints')
@@ -160,6 +161,8 @@ class ViewConsultation extends Page
      */
     private function resolveDocuments(): array
     {
+        $this->consultation ??= $this->loadConsultation();
+
         if (! $this->consultation) {
             return [];
         }
@@ -171,5 +174,15 @@ class ViewConsultation extends Page
                 'size' => $media->size,
             ])
             ->all();
+    }
+
+    private function loadConsultation(): Consultation
+    {
+        $patient = $this->getPatient();
+
+        return Consultation::query()
+            ->where('patient_id', $patient->id)
+            ->with(['doctor', 'vitalSign'])
+            ->findOrFail($this->consultationId);
     }
 }

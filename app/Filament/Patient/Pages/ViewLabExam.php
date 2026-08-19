@@ -52,9 +52,10 @@ class ViewLabExam extends Page
         return false;
     }
 
-    public function infolist(Schema $schema): Schema
+    public function content(Schema $schema): Schema
     {
         return $schema
+            ->record($this->labRequest ??= $this->loadLabRequest())
             ->schema([
                 Section::make('Informations de la demande')
                     ->schema([
@@ -128,7 +129,7 @@ class ViewLabExam extends Page
                             ->columnSpanFull(),
                     ]),
                 Section::make('Rapport')
-                    ->visible(fn (): bool => $this->labRequest?->report !== null)
+                    ->visible(fn (): bool => ($this->labRequest ??= $this->loadLabRequest())?->report !== null)
                     ->schema([
                         TextEntry::make('report.report_number')
                             ->label('N° rapport'),
@@ -146,5 +147,15 @@ class ViewLabExam extends Page
                     ])
                     ->columns(2),
             ]);
+    }
+
+    private function loadLabRequest(): LaboratoryRequest
+    {
+        $patient = $this->getPatient();
+
+        return LaboratoryRequest::query()
+            ->where('patient_id', $patient->id)
+            ->with(['doctor', 'laboratory', 'items.results', 'report'])
+            ->findOrFail($this->labRequestId);
     }
 }

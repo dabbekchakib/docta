@@ -39,7 +39,7 @@ class PatientStatsWidget extends StatsOverviewWidget
             Stat::make('Consultations', $totalConsultations)
                 ->description('Total')
                 ->descriptionIcon(Heroicon::OutlinedClipboardDocumentList)
-                ->icon(Heroicon::OutlinedStethoscope)
+                ->icon(Heroicon::OutlinedHeart)
                 ->color('info'),
             Stat::make('Ordonnances', $totalPrescriptions)
                 ->description('Total')

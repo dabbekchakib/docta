@@ -15,15 +15,21 @@ use App\Models\Invoice;
 use App\Models\LaboratoryRequest;
 use App\Models\Prescription;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Enums\Size;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 
 class ViewConsultation extends ViewRecord
 {
     protected static string $resource = ConsultationResource::class;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
 
     public function mount(int|string $record): void
     {
@@ -35,6 +41,18 @@ class ViewConsultation extends ViewRecord
             ->log('Fiche consultation consultée');
     }
 
+    public function getHeader(): ?View
+    {
+        return view('filament.pages.stacked-header', [
+            'breadcrumbs' => filament()->hasBreadcrumbs() ? $this->getBreadcrumbs() : [],
+            'heading' => $this->getHeading(),
+            'subheading' => $this->getSubheading(),
+            'actions' => $this->getCachedHeaderActions(),
+            'actionsAlignment' => $this->getHeaderActionsAlignment(),
+            'scopes' => $this->getRenderHookScopes(),
+        ]);
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -42,33 +60,39 @@ class ViewConsultation extends ViewRecord
                 ->label('Créer une facture')
                 ->icon(Heroicon::OutlinedReceiptPercent)
                 ->color('primary')
+                ->size(Size::Small)
                 ->visible(fn (): bool => auth()->user()?->can('create', Invoice::class) ?? false)
                 ->url(fn (): string => InvoiceResource::getUrl('create', ['consultation' => $this->record->id])),
             Action::make('createPrescription')
                 ->label('Créer une ordonnance')
                 ->icon(Heroicon::OutlinedClipboardDocumentList)
                 ->color('success')
+                ->size(Size::Small)
                 ->visible(fn (): bool => auth()->user()?->can('create', Prescription::class) ?? false)
                 ->url(fn (): string => PrescriptionResource::getUrl('create', ['consultation' => $this->record->id])),
             Action::make('prescribeLaboratory')
                 ->label('Prescrire un examen')
                 ->icon(Heroicon::OutlinedBeaker)
                 ->color('primary')
+                ->size(Size::Small)
                 ->visible(fn (): bool => auth()->user()?->can('create', LaboratoryRequest::class) ?? false)
                 ->url(fn (): string => LaboratoryRequestResource::getUrl('create', ['consultation' => $this->record->id])),
             Action::make('openMedicalRecord')
                 ->label('Voir le dossier médical')
                 ->icon(Heroicon::OutlinedFolder)
                 ->color('gray')
+                ->size(Size::Small)
                 ->visible(fn (): bool => $this->record instanceof Consultation
                     && $this->record->patient?->medicalRecord
                     && auth()->user()?->can('view', $this->record->patient->medicalRecord) ?? false)
                 ->url(fn (): string => MedicalRecordResource::getUrl('view', ['record' => $this->record->patient?->medicalRecord])),
-            CompleteConsultationAction::make(),
-            CancelConsultationAction::make(),
-            PrintConsultationAction::make(),
-            EditAction::make(),
-            DeleteAction::make(),
+            PrintConsultationAction::make()->size(Size::Small),
+            ActionGroup::make([
+                CompleteConsultationAction::make(),
+                CancelConsultationAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])->label('Actions')->icon(Heroicon::OutlinedEllipsisVertical)->size(Size::Small),
         ];
     }
 }

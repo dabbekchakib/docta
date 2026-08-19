@@ -23,6 +23,8 @@ class MyAppointments extends Page implements HasTable
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-m-calendar-days';
 
+    protected static ?string $navigationLabel = 'Mes rendez-vous';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Mes soins';
 
     protected static ?int $navigationSort = 2;
