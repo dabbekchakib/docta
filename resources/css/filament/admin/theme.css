@@ -9,19 +9,22 @@
 }
 
 .fi-header-actions-ctn {
-    display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     gap: 0.5rem !important;
+}
+
+.fi-stacked-header-actions {
+    display: flex !important;
     width: 100% !important;
 }
 
-.fi-header-actions-ctn > * {
+.fi-stacked-header-actions > * {
     flex: 1 1 0% !important;
     min-width: 0;
 }
 
-.fi-header-actions-ctn .fi-btn,
-.fi-header-actions-ctn .fi-dropdown {
+.fi-stacked-header-actions .fi-btn,
+.fi-stacked-header-actions .fi-dropdown {
     flex: 1 1 0% !important;
 }

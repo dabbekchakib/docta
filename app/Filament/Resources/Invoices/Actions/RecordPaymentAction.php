@@ -6,6 +6,7 @@ use App\Models\PaymentMethod;
 use App\Services\PaymentService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -26,16 +27,23 @@ class RecordPaymentAction extends Action
             ->modalHeading('Ajouter un paiement')
             ->modalDescription('Le paiement est encaissé immédiatement et un reçu (REC-…) est émis automatiquement. Le montant est plafonné au restant dû.')
             ->form([
+                Placeholder::make('remaining_display')
+                    ->label('Restant dû')
+                    ->content(fn ($record): string => $record
+                        ? number_format((float) $record->amount_remaining, 3, ',', ' ').' DT'
+                        : '—'),
                 TextInput::make('amount')
                     ->label('Montant (TND)')
                     ->numeric()
                     ->required()
                     ->minValue(0.001)
                     ->prefix('DT')
-                    ->default(fn (Action $action): ?string => $action->getRecord()->amount_remaining > 0
-                        ? number_format((float) $action->getRecord()->amount_remaining, 3, '.', '')
-                        : null)
-                    ->helperText(fn (Action $action): string => 'Restant dû : '.number_format((float) $action->getRecord()->amount_remaining, 3, ',', ' ').' DT'),
+                    ->maxValue(fn ($record): float => (float) ($record?->amount_remaining ?? 0))
+                    ->afterStateHydrated(function (TextInput $component, $record): void {
+                        if ($record && (float) ($record->amount_remaining ?? 0) > 0) {
+                            $component->state(number_format((float) $record->amount_remaining, 3, '.', ''));
+                        }
+                    }),
                 Select::make('payment_method_id')
                     ->label('Moyen de paiement')
                     ->options(fn (): array => self::paymentMethods())

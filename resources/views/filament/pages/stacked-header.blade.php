@@ -49,7 +49,7 @@
     @endphp
 
     @if (filled($beforeActions) || $actions || filled($afterActions))
-        <div class="fi-header-actions-ctn w-full">
+        <div class="fi-header-actions-ctn fi-stacked-header-actions w-full">
             {{ $beforeActions }}
 
             @if ($actions)
