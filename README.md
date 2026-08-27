@@ -1,36 +1,51 @@
+<div align="center">
+
 # 🏥 DOCTA — ERP Médical
 
-**DOCTA** est une plateforme ERP médicale professionnelle destinée à la gestion complète des cabinets médicaux tunisiens : patients, rendez-vous, consultations, dossiers médicaux, ordonnances, facturation et paiements — le tout dans une interface moderne, sécurisée et multirôles.
+**La gestion du cabinet médical, simplifiée.**
+
+[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com)
+[![Filament](https://img.shields.io/badge/Filament-4-FFB703?style=for-the-badge&logo=filament&logoColor=white)](https://filamentphp.com)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+*Plateforme ERP médicale professionnelle pour la gestion complète des cabinets médicaux tunisiens.*
+
+</div>
+
+---
+
+## 🌟 Aperçu — Page d'accueil
+
+<div align="center">
+
+![DOCTA — Page d'accueil](docs/docta-home.png)
+
+</div>
+
+DOCTA est une solution tout-en-un dédiée aux **cabinets médicaux tunisiens** : patients, rendez-vous, consultations, dossiers médicaux, ordonnances électroniques et facturation — réunis dans une interface moderne, sécurisée et multirôles.
 
 ---
 
 ## 📋 Table des matières
 
-- [À propos](#-à-propos)
-- [Fonctionnalités](#-fonctionnalités)
-- [Stack technique](#-stack-technique)
-- [Architecture du projet](#-architecture-du-projet)
-- [Gestion des utilisateurs et permissions](#-gestion-des-utilisateurs-et-permissions)
-- [Modules métier](#-modules-métier)
-  - [Module Administration](#module-administration)
-  - [Module Médecins](#module-médecins)
-  - [Module Secrétaires](#module-secrétaires)
-  - [Module Patients](#module-patients)
-  - [Module Rendez-vous](#module-rendez-vous)
-  - [Module Consultations](#module-consultations)
-  - [Module Dossier médical](#module-dossier-médical)
-  - [Module Ordonnances](#module-ordonnances)
-  - [Module Facturation](#module-facturation)
-- [Gestion des fichiers](#-gestion-des-fichiers)
-- [Génération PDF](#-génération-pdf)
-- [Notifications](#-notifications)
-- [Sécurité et audit](#-sécurité-et-audit)
-- [Base de données](#-base-de-données)
-- [Installation](#-installation)
-- [Utilisation](#-utilisation)
-- [Tests](#-tests)
-- [Phases de développement](#-phases-de-développement)
-- [Conventions de code](#-conventions-de-code)
+- [💡 À propos](#-à-propos)
+- [✨ Fonctionnalités](#-fonctionnalités)
+- [🛠️ Stack technique](#-stack-technique)
+- [🏗️ Architecture du projet](#-architecture-du-projet)
+- [👥 Gestion des utilisateurs et permissions](#-gestion-des-utilisateurs-et-permissions)
+- [🧩 Modules métier](#-modules-métier)
+- [📂 Gestion des fichiers](#-gestion-des-fichiers)
+- [🖨️ Génération PDF](#-génération-pdf)
+- [🔔 Notifications](#-notifications)
+- [🔒 Sécurité et audit](#-sécurité-et-audit)
+- [🗄️ Base de données](#-base-de-données)
+- [⚙️ Installation](#-installation)
+- [🚀 Utilisation](#-utilisation)
+- [🧪 Tests](#-tests)
+- [🗺️ Phases de développement](#-phases-de-développement)
+- [📐 Conventions de code](#-conventions-de-code)
 
 ---
 
@@ -38,12 +53,14 @@
 
 Les cabinets médicaux tunisiens ont besoin d'un outil unique pour gérer l'ensemble de leur activité administrative et médicale. **DOCTA** centralise :
 
-- 👨‍⚕️ La gestion des médecins et secrétaires
-- 🧑‍🤝‍🧑 Le suivi complet des patients
-- 📅 La planification des rendez-vous avec agenda
-- 🩺 Les consultations et dossiers médicaux
-- 💊 Les ordonnances imprimables (PDF + QR Code)
-- 💰 La facturation, les paiements et les statistiques financières
+| | |
+|---|---|
+| 👨‍⚕️ | La gestion des **médecins** et **secrétaires** |
+| 🧑‍🤝‍🧑 | Le suivi complet des **patients** |
+| 📅 | La planification des **rendez-vous** avec agenda |
+| 🩺 | Les **consultations** et **dossiers médicaux** |
+| 💊 | Les **ordonnances** imprimables (PDF + QR Code) |
+| 💰 | La **facturation**, les **paiements** et les statistiques financières |
 
 ---
 
@@ -180,12 +197,14 @@ Panneau Filament Admin avec :
 
 **Dashboard Admin — Widgets :**
 
-- Nombre de patients
-- Nombre de médecins
-- Rendez-vous du jour
-- Chiffre d'affaires
-- Consultations mensuelles
-- Paiements
+| Widget | Description |
+|---|---|
+| 👥 Patients | Nombre de patients |
+| 👨‍⚕️ Médecins | Nombre de médecins |
+| 📅 Rendez-vous | Rendez-vous du jour |
+| 💰 Chiffre d'affaires | Revenu cumulé |
+| 🩺 Consultations | Consultations mensuelles |
+| 💳 Paiements | Encaissements récents |
 
 ### Module Médecins
 
@@ -445,7 +464,7 @@ npm run build
 php artisan serve
 ```
 
-> 💡 Alternative rapide : `composer setup` exécute automatiquement l'installation complète, et `composer dev` lance serveur, queues, logs et Vite simultanément.
+> 💡 **Astuce** : `composer setup` exécute automatiquement l'installation complète, et `composer dev` lance serveur, queues, logs et Vite simultanément.
 
 ---
 
@@ -521,6 +540,10 @@ Faire de **DOCTA** un ERP médical professionnel, fiable et prêt à être comme
 
 ---
 
-<p align="center">
-  <strong>DOCTA</strong> — La gestion du cabinet médical, simplifiée.
-</p>
+<div align="center">
+
+**DOCTA** — La gestion du cabinet médical, simplifiée.
+
+*© 2026 DOCTA. Tous droits réservés.*
+
+</div>
