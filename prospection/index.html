@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DOCTA - Logiciel de Gestion Médicale pour Médecins Tunisiens</title>
+<meta name="description" content="DOCTA, l'ERP médical intelligent pour les médecins tunisiens. Gestion des patients, rendez-vous, dossiers médicaux, ordonnances et facturation." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#eff9ff',
+          100: '#dcf2fc',
+          200: '#c3e6f9',
+          300: '#9ad4f3',
+          400: '#6abae9',
+          500: '#439ede',
+          600: '#2f82c8',
+          700: '#2869a9',
+          800: '#27588a',
+          900: '#254a72',
+          950: '#122a45'
+        },
+        teal: {
+          50: '#effcf9',
+          100: '#d6f7ee',
+          200: '#b0eee0',
+          300: '#7cdfcd',
+          400: '#45c7b4',
+          500: '#2bb0a0',
+          600: '#1f8e83',
+          700: '#1c726a',
+          800: '#1a5b55',
+          900: '#194b47',
+          950: '#0a2b29'
+        }
+      }
+    }
+  }
+}
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; }
+  html[lang="ar"] body, html[lang="ar"] .font-jakarta { font-family: 'Tajawal', sans-serif; }
+  .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .hero-gradient { background: linear-gradient(135deg, #122a45 0%, #254a72 45%, #2f82c8 100%); }
+  .wave-divider { position: absolute; bottom: 0; left: 0; }
+  .feature-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(18,42,69,0.15); }
+  .feature-card { transition: all 0.3s ease; }
+  .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .badge-glow { box-shadow: 0 0 24px rgba(43,176,160,0.4); }
+  .stat-number { font-variant-numeric: tabular-nums; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+  .float-anim { animation: float 5s ease-in-out infinite; }
+  @keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(43,176,160,0.5)} 70%{box-shadow:0 0 0 16px rgba(43,176,160,0)} 100%{box-shadow:0 0 0 0 rgba(43,176,160,0)} }
+  .pulse-ring { animation: pulse-ring 2.5s infinite; }
+  .lang-menu { transition: opacity 0.2s ease, transform 0.2s ease; transform-origin: top right; }
+  html[dir="rtl"] .lang-menu { transform-origin: top left; }
+</style>
+</head>
+<body class="bg-white text-slate-800 antialiased">
+
+<!-- ===================== BARRE DE NAVIGATION ===================== -->
+<header class="fixed top-0 inset-x-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <a href="#" class="flex items-center gap-2 shrink-0">
+      <div class="w-10 h-10 rounded-xl hero-gradient flex items-center justify-center text-white text-lg font-bold shadow-lg">D</div>
+      <span class="font-jakarta text-xl font-extrabold text-primary-900">DOCTA</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+      <a href="#fonctionnalites" class="hover:text-primary-600 transition" data-i18n="nav.features">Fonctionnalités</a>
+      <a href="#modules" class="hover:text-primary-600 transition" data-i18n="nav.modules">Modules</a>
+      <a href="#avantages" class="hover:text-primary-600 transition" data-i18n="nav.benefits">Avantages</a>
+      <a href="#securite" class="hover:text-primary-600 transition" data-i18n="nav.security">Sécurité</a>
+      <a href="#contact" class="hover:text-primary-600 transition" data-i18n="nav.contact">Contact</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <!-- Sélecteur de langue -->
+      <div class="relative" id="langSwitcher">
+        <button id="langBtn" class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold px-3.5 py-2 rounded-full hover:bg-primary-50 hover:border-primary-200 transition">
+          <i class="fa-solid fa-globe text-primary-500"></i>
+          <span id="langBtnLabel">FR</span>
+          <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+        </button>
+        <div id="langMenu" class="lang-menu hidden absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+          <button data-lang="fr" class="lang-option w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-primary-50 transition">
+            <span>Français</span><span class="text-xs text-slate-400">FR</span>
+          </button>
+          <button data-lang="ar" class="lang-option w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-primary-50 transition">
+            <span>العربية</span><span class="text-xs text-slate-400">AR</span>
+          </button>
+          <button data-lang="en" class="lang-option w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-primary-50 transition">
+            <span>English</span><span class="text-xs text-slate-400">EN</span>
+          </button>
+        </div>
+      </div>
+      <a href="https://wa.me/21696584737" data-wa target="_blank" class="hidden sm:inline-flex items-center gap-2 bg-teal-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-teal-600 transition shadow-md hover:shadow-lg">
+        <i class="fa-brands fa-whatsapp text-base"></i> <span data-i18n="nav.cta">Démarrer maintenant</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero-gradient relative overflow-hidden pt-32 pb-28 text-white">
+  <div class="absolute inset-0 opacity-10" style="background-image:url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1170&auto=format&fit=crop');background-size:cover;background-position:center;"></div>
+  <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-teal-400/20 blur-3xl"></div>
+  <div class="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-primary-400/20 blur-3xl"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 text-xs font-medium text-teal-200 mb-6">
+          <span class="w-2 h-2 bg-teal-400 rounded-full pulse-ring"></span>
+          <span data-i18n="hero.badge">L'ERP médical de référence en Tunisie</span>
+        </div>
+        <h1 class="font-jakarta text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+          <span data-i18n="hero.title1">Gérez votre cabinet</span> <span class="text-teal-300" data-i18n="hero.title2">sans stress</span><span data-i18n="hero.title3">, soignez avec excellence</span>
+        </h1>
+        <p class="text-lg text-primary-100/90 leading-relaxed mb-8 max-w-xl" data-i18n="hero.subtitle">
+          DOCTA est la plateforme complète qui centralise vos patients, rendez-vous, dossiers médicaux, ordonnances et facturation dans un seul outil simple, rapide et sécurisé — conçu pour les médecins tunisiens.
+        </p>
+        <div class="flex flex-wrap gap-4 mb-10">
+          <a href="https://wa.me/21696584737" data-wa target="_blank" class="inline-flex items-center gap-2 bg-teal-400 text-primary-950 font-bold px-7 py-3.5 rounded-full hover:bg-teal-300 transition shadow-xl hover:shadow-2xl badge-glow">
+            <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="hero.demo">Demander une démo</span>
+          </a>
+          <a href="#fonctionnalites" class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/25 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/20 transition">
+            <i class="fa-solid fa-play"></i> <span data-i18n="hero.discover">Découvrir</span>
+          </a>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-primary-100/80">
+          <div class="flex -space-x-3">
+            <img class="w-10 h-10 rounded-full border-2 border-primary-800 object-cover" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Médecin" />
+            <img class="w-10 h-10 rounded-full border-2 border-primary-800 object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Médecin" />
+            <img class="w-10 h-10 rounded-full border-2 border-primary-800 object-cover" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Médecin" />
+            <img class="w-10 h-10 rounded-full border-2 border-primary-800 object-cover" src="https://randomuser.me/api/portraits/men/11.jpg" alt="Médecin" />
+          </div>
+          <span data-i18n-html="hero.trust"><strong class="text-white font-bold"><bdi dir="ltr">+50</bdi></strong> médecins et cabinets<br />font déjà confiance</span>
+        </div>
+      </div>
+
+      <div class="relative hidden lg:block">
+        <div class="float-anim">
+          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1170&auto=format&fit=crop" alt="Consultation médicale moderne" class="rounded-3xl shadow-2xl object-cover w-full h-[420px] border-4 border-white/20" />
+        </div>
+        <div class="absolute -bottom-6 -left-8 bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-[240px] float-anim" style="animation-delay:1.5s">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center text-xl"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div>
+              <p class="text-2xl font-extrabold text-primary-900 stat-number"><bdi dir="ltr">1 250 DT</bdi></p>
+              <p class="text-xs text-slate-500" data-i18n="widget.earning">Encaissé ce mois-ci</p>
+            </div>
+          </div>
+        </div>
+        <div class="absolute -top-6 -right-6 bg-white text-slate-800 rounded-2xl shadow-2xl p-4 flex items-center gap-3 float-anim" style="animation-delay:2.5s">
+          <div class="w-11 h-11 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center text-xl"><i class="fa-solid fa-calendar-check"></i></div>
+          <div>
+            <p class="font-extrabold text-primary-900 stat-number"><bdi dir="ltr">98%</bdi></p>
+            <p class="text-xs text-slate-500" data-i18n="widget.attendance">Rendez-vous honorés</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <svg class="wave-divider w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" fill="#ffffff"><path d="M0,32 C240,80 480,0 720,20 C960,40 1200,90 1440,50 L1440,100 L0,100 Z"></path></svg>
+</section>
+
+<!-- ===================== CHIFFRES CLÉS ===================== -->
+<section class="py-14 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+      <div class="reveal">
+        <p class="font-jakarta text-4xl font-extrabold text-primary-800 stat-number"><bdi dir="ltr">-70%</bdi></p>
+        <p class="text-slate-500 text-sm mt-1" data-i18n="stats.1">de temps administratif économisé</p>
+      </div>
+      <div class="reveal">
+        <p class="font-jakarta text-4xl font-extrabold text-primary-800 stat-number"><bdi dir="ltr">24/7</bdi></p>
+        <p class="text-slate-500 text-sm mt-1" data-i18n="stats.2">accès à vos dossiers, partout</p>
+      </div>
+      <div class="reveal">
+        <p class="font-jakarta text-4xl font-extrabold text-primary-800 stat-number"><bdi dir="ltr">100%</bdi></p>
+        <p class="text-slate-500 text-sm mt-1" data-i18n="stats.3">données chiffrées et protégées</p>
+      </div>
+      <div class="reveal">
+        <p class="font-jakarta text-4xl font-extrabold text-primary-800 stat-number"><bdi dir="ltr">+50</bdi></p>
+        <p class="text-slate-500 text-sm mt-1" data-i18n="stats.4">médecins partenaires en Tunisie</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FONCTIONNALITÉS ===================== -->
+<section id="fonctionnalites" class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+      <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold uppercase tracking-widest rounded-full px-4 py-1.5 mb-4" data-i18n="features.badge">Fonctionnalités</span>
+      <h2 class="font-jakarta text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary-900 leading-tight mb-4"><span data-i18n="features.title1">Tout votre cabinet,</span> <span class="text-teal-600" data-i18n="features.title2">un seul logiciel</span></h2>
+      <p class="text-slate-600 text-lg" data-i18n="features.subtitle">DOCTA réunit l'ensemble de vos outils quotidiens dans une plateforme intuitive pensée pour les médecins et leurs secrétaires.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Patient -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-user-injured"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.1.t">Fiches patients complètes</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.1.d">Numéro patient automatique (PAT-000001), CIN, cnam, assurance, photos, urgences, historique médical complet — tout à portée de main en un clic.</p>
+      </div>
+      <!-- Rendez-vous -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-calendar-check"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.2.t">Agenda intelligent</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.2.d">Planifiez vos rendez-vous, confirmez automatiquement par notification, détectez les absents et optimisez chaque créneau de votre journée.</p>
+      </div>
+      <!-- Dossier médical -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-folder-open"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.3.t">Dossier médical numérique</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.3.d">Antécédents, allergies, maladies chroniques, vaccinations et documents. Un suivi patient fiable et instantané, à vie.</p>
+      </div>
+      <!-- Consultation -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-stethoscope"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.4.t">Consultations structurées</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.4.d">Diagnostics, constantes (poids, tension, pouls), observations et notes — consignés proprement et liés automatiquement au dossier du patient.</p>
+      </div>
+      <!-- Ordonnance -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-prescription-bottle-medical"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.5.t">Ordonnances PDF + QR Code</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.5.d">Générez des ordonnances professionnelles en PDF avec QR Code, imprimables et partageables en quelques secondes.</p>
+      </div>
+      <!-- Facturation -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.6.t">Facturation &amp; encaissement</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.6.d">Factures, reçus PDF, paiements espèces, carte, chèque, cnam et assurance. Statistiques de chiffre d'affaires en temps réel.</p>
+      </div>
+      <!-- Statistiques -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-chart-line"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.7.t">Rapports &amp; tableaux de bord</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.7.d">Suivez vos consultations mensuelles, votre chiffre d'affaires et vos paiements grâce à des statistiques claires et lisibles.</p>
+      </div>
+      <!-- Notifications -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-bell"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.8.t">Notifications automatiques</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.8.d">Nouveau rendez-vous, confirmation, rappel de consultation, paiement reçu : plus aucun oubli, plus aucune relance manuelle.</p>
+      </div>
+      <!-- Sécurité -->
+      <div class="feature-card reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+        <div class="w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3 class="font-jakarta text-lg font-bold text-primary-950 mb-2" data-i18n="feat.9.t">Sécurité &amp; conformité</h3>
+        <p class="text-slate-600 text-sm leading-relaxed" data-i18n="feat.9.d">Journal d'activité complet, gestion fine des rôles (médecin, secrétaire, comptable), protections de vos données médicales sensibles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULES ===================== -->
+<section id="modules" class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-16 items-center mb-20">
+      <div class="reveal">
+        <span class="inline-block bg-primary-100 text-primary-700 text-xs font-bold uppercase tracking-widest rounded-full px-4 py-1.5 mb-4" data-i18n="modules.badge">Modules intégrés</span>
+        <h2 class="font-jakarta text-3xl sm:text-4xl font-extrabold text-primary-900 leading-tight mb-6"><span data-i18n="modules.title1">Une plateforme pensée pour</span> <span class="text-teal-600" data-i18n="modules.title2">chaque spécialité</span></h2>
+        <p class="text-slate-600 text-lg leading-relaxed mb-8" data-i18n="modules.subtitle">Adapté à tous les cabinets et polycliniques tunisiens — médecine générale, cardiologie, dermatologie, pédiatrie, gynécologie, orthopédie, dentaire et bien plus.</p>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3 text-slate-700">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs mt-0.5"><i class="fa-solid fa-check"></i></span>
+            <span data-i18n-html="modules.1">dossiers structurés et recherche globale instantanée.</span>
+          </li>
+          <li class="flex items-start gap-3 text-slate-700">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs mt-0.5"><i class="fa-solid fa-check"></i></span>
+            <span data-i18n-html="modules.2">planification visuelle, statuts et notifications.</span>
+          </li>
+          <li class="flex items-start gap-3 text-slate-700">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs mt-0.5"><i class="fa-solid fa-check"></i></span>
+            <span data-i18n-html="modules.3">diagnostics et historique médical liés.</span>
+          </li>
+          <li class="flex items-start gap-3 text-slate-700">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs mt-0.5"><i class="fa-solid fa-check"></i></span>
+            <span data-i18n-html="modules.4">avec QR Code sécurisé.</span>
+          </li>
+          <li class="flex items-start gap-3 text-slate-700">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs mt-0.5"><i class="fa-solid fa-check"></i></span>
+            <span data-i18n-html="modules.5">cnam, assurance, espèces, carte, chèque.</span>
+          </li>
+          <li class="flex items-start gap-3 text-slate-700">
+            <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs mt-0.5"><i class="fa-solid fa-check"></i></span>
+            <span data-i18n-html="modules.6">pilotage financier et d'activité.</span>
+          </li>
+        </ul>
+      </div>
+      <div class="relative reveal">
+        <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1170&auto=format&fit=crop" alt="Médecin utilisant un logiciel médical" class="rounded-3xl shadow-2xl object-cover w-full h-[440px]" />
+        <div class="absolute -bottom-8 -right-6 bg-white rounded-2xl shadow-2xl p-5 border border-slate-100 max-w-[260px]">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center"><i class="fa-solid fa-user-check"></i></div>
+            <p class="text-sm font-bold text-primary-950" data-i18n="widget.patients">Patients aujourd'hui</p>
+          </div>
+          <div class="flex items-end justify-between">
+            <span class="text-3xl font-extrabold text-teal-600 stat-number"><bdi dir="ltr">24</bdi></span>
+            <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-arrow-up"></i> <bdi dir="ltr">+12%</bdi></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SPÉCIALITÉS ===================== -->
+<section class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-14 reveal">
+      <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold uppercase tracking-widest rounded-full px-4 py-1.5 mb-4" data-i18n="spec.badge">Adapté à votre spécialité</span>
+      <h2 class="font-jakarta text-3xl sm:text-4xl font-extrabold text-primary-900 leading-tight"><span data-i18n="spec.title1">Parfait pour</span> <span class="text-teal-600" data-i18n="spec.title2">tous les cabinets</span></h2>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-primary-500 mb-3"><i class="fa-solid fa-user-doctor"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.1">Généraliste</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-teal-500 mb-3"><i class="fa-solid fa-heart-pulse"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.2">Cardiologue</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-primary-500 mb-3"><i class="fa-solid fa-baby"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.3">Pédiatre</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-teal-500 mb-3"><i class="fa-solid fa-hand"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.4">Dermatologue</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-primary-500 mb-3"><i class="fa-solid fa-venus"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.5">Gynécologue</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-teal-500 mb-3"><i class="fa-solid fa-bone"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.6">Orthopédiste</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-primary-500 mb-3"><i class="fa-solid fa-tooth"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.7">Dentiste</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-teal-500 mb-3"><i class="fa-solid fa-brain"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.8">Neurologue</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-primary-500 mb-3"><i class="fa-solid fa-eye"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.9">Ophtalmologue</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-teal-500 mb-3"><i class="fa-solid fa-ear-listen"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.10">ORL</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-primary-500 mb-3"><i class="fa-solid fa-lungs"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.11">Pneumologue</p></div>
+      <div class="reveal bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition"><div class="text-4xl text-teal-500 mb-3"><i class="fa-solid fa-flask"></i></div><p class="font-semibold text-slate-800 text-sm" data-i18n="spec.12">Laboratoire</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== AVANTAGES ===================== -->
+<section id="avantages" class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+      <span class="inline-block bg-primary-100 text-primary-700 text-xs font-bold uppercase tracking-widest rounded-full px-4 py-1.5 mb-4" data-i18n="adv.badge">Pourquoi DOCTA ?</span>
+      <h2 class="font-jakarta text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary-900 leading-tight mb-4"><span data-i18n="adv.title1">Passez plus de temps à soigner,</span> <span class="text-teal-600" data-i18n="adv.title2">moins à gérer</span></h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10 items-center mb-20">
+      <div class="reveal order-2 md:order-1">
+        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1170&auto=format&fit=crop" alt="Médecin dans son cabinet" class="rounded-3xl shadow-2xl object-cover w-full h-[400px]" />
+      </div>
+      <div class="order-1 md:order-2 space-y-6 reveal">
+        <div class="flex gap-4">
+          <div class="w-12 h-12 shrink-0 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center text-xl"><i class="fa-solid fa-bolt"></i></div>
+          <div>
+            <h3 class="font-bold text-primary-950 mb-1" data-i18n="adv.1.t">Gain de temps immédiat</h3>
+            <p class="text-slate-600 text-sm" data-i18n="adv.1.d">Fiches patients pré-remplies, ordonnances en 10 secondes, factures générées automatiquement : récupérez des heures chaque semaine.</p>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <div class="w-12 h-12 shrink-0 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div>
+          <div>
+            <h3 class="font-bold text-primary-950 mb-1" data-i18n="adv.2.t">Accessible partout</h3>
+            <p class="text-slate-600 text-sm" data-i18n="adv.2.d">PC, tablette ou téléphone : consultez vos dossiers à la clinique, à la maison ou en déplacement, même sans connexion.</p>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <div class="w-12 h-12 shrink-0 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center text-xl"><i class="fa-solid fa-users-gear"></i></div>
+          <div>
+            <h3 class="font-bold text-primary-950 mb-1" data-i18n="adv.3.t">Équipe simplifiée</h3>
+            <p class="text-slate-600 text-sm" data-i18n="adv.3.d">Votre secrétaire gère l'agenda, les patients et l'encaissement. Votre comptable suit les comptes. Vous, vous soignez.</p>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <div class="w-12 h-12 shrink-0 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+          <div>
+            <h3 class="font-bold text-primary-950 mb-1" data-i18n="adv.4.t">Rentabilité maîtrisée</h3>
+            <p class="text-slate-600 text-sm" data-i18n="adv.4.d">Zero papier perdu, encaissements maîtrisés, tableau de bord financier clair pour prendre les meilleures décisions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS BANDE -->
+    <div class="hero-gradient rounded-3xl p-10 lg:p-14 text-white relative overflow-hidden reveal">
+      <div class="absolute top-0 right-0 w-72 h-72 rounded-full bg-teal-400/20 blur-3xl"></div>
+      <div class="grid md:grid-cols-4 gap-8 text-center relative">
+        <div><i class="fa-solid fa-clock text-3xl text-teal-300 mb-3"></i><p class="font-jakarta text-3xl font-extrabold stat-number"><bdi dir="ltr">10 min</bdi></p><p class="text-primary-100 text-sm mt-1" data-i18n="advstat.1">pour créer un dossier patient</p></div>
+        <div><i class="fa-solid fa-prescription text-3xl text-teal-300 mb-3"></i><p class="font-jakarta text-3xl font-extrabold stat-number"><bdi dir="ltr">10 sec</bdi></p><p class="text-primary-100 text-sm mt-1" data-i18n="advstat.2">pour générer une ordonnance</p></div>
+        <div><i class="fa-solid fa-file-invoice text-3xl text-teal-300 mb-3"></i><p class="font-jakarta text-3xl font-extrabold stat-number"><span data-i18n="advstat.3.v">0 papier</span></p><p class="text-primary-100 text-sm mt-1" data-i18n="advstat.3.c">dossiers 100% numériques</p></div>
+        <div><i class="fa-solid fa-cloud-arrow-up text-3xl text-teal-300 mb-3"></i><p class="font-jakarta text-3xl font-extrabold stat-number" data-i18n="advstat.4.v">Sauvegarde</p><p class="text-primary-100 text-sm mt-1" data-i18n="advstat.4.c">auto &amp; sécurisée de vos données</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SÉCURITÉ ===================== -->
+<section id="securite" class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+      <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold uppercase tracking-widest rounded-full px-4 py-1.5 mb-4" data-i18n="secu.badge">Sécurité &amp; confidentialité</span>
+      <h2 class="font-jakarta text-3xl sm:text-4xl font-extrabold text-primary-900 leading-tight mb-4"><span data-i18n="secu.title1">Vos données médicales sont</span> <span class="text-teal-600" data-i18n="secu.title2">sacrées</span></h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm text-center">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-lock"></i></div>
+        <h3 class="font-bold text-primary-950 mb-2" data-i18n="secu.1.t">Chiffrement fort</h3>
+        <p class="text-slate-600 text-sm" data-i18n="secu.1.d">Vos données sont chiffrées et stockées sur des serveurs sécurisés en Europe et en Tunisie.</p>
+      </div>
+      <div class="reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm text-center">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-user-shield"></i></div>
+        <h3 class="font-bold text-primary-950 mb-2" data-i18n="secu.2.t">Rôles &amp; permissions</h3>
+        <p class="text-slate-600 text-sm" data-i18n="secu.2.d">Chaque membre de l'équipe n'accède qu'à ce dont il a besoin. Journal d'activité complet.</p>
+      </div>
+      <div class="reveal bg-white rounded-2xl p-7 border border-slate-100 shadow-sm text-center">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-2xl mb-5"><i class="fa-solid fa-database"></i></div>
+        <h3 class="font-bold text-primary-950 mb-2" data-i18n="secu.3.t">Sauvegardes automatiques</h3>
+        <p class="text-slate-600 text-sm" data-i18n="secu.3.d">Sauvegardes quotidiennes automatiques : en cas d'incident, vos données restent intactes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TÉMOIGNAGES ===================== -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+      <span class="inline-block bg-primary-100 text-primary-700 text-xs font-bold uppercase tracking-widest rounded-full px-4 py-1.5 mb-4" data-i18n="testim.badge">Témoignages</span>
+      <h2 class="font-jakarta text-3xl sm:text-4xl font-extrabold text-primary-900 leading-tight"><span data-i18n="testim.title1">Ils utilisent DOCTA au</span> <span class="text-teal-600" data-i18n="testim.title2">quotidien</span></h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="reveal bg-slate-50 rounded-2xl p-7 border border-slate-100">
+        <div class="flex text-amber-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="text-slate-700 text-sm leading-relaxed mb-6" data-i18n="test.1.text">"Depuis DOCTA, ma secrétaire gère tout l'agenda et les encaissements. J'ai récupéré un temps précieux et ma patientèle est mieux suivie."</p>
+        <div class="flex items-center gap-3">
+          <img class="w-11 h-11 rounded-full object-cover" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dr." />
+          <div><p class="font-bold text-primary-950 text-sm">Dr. Sonia B.</p><p class="text-xs text-slate-500" data-i18n="test.1.role">Médecin généraliste, Tunis</p></div>
+        </div>
+      </div>
+      <div class="reveal bg-slate-50 rounded-2xl p-7 border border-slate-100">
+        <div class="flex text-amber-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="text-slate-700 text-sm leading-relaxed mb-6" data-i18n="test.2.text">"Les ordonnances PDF avec QR Code et la facturation cnam m'ont fait gagner énormément de temps. Le support est très réactif."</p>
+        <div class="flex items-center gap-3">
+          <img class="w-11 h-11 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Dr." />
+          <div><p class="font-bold text-primary-950 text-sm">Dr. Karim M.</p><p class="text-xs text-slate-500" data-i18n="test.2.role">Cardiologue, Sfax</p></div>
+        </div>
+      </div>
+      <div class="reveal bg-slate-50 rounded-2xl p-7 border border-slate-100">
+        <div class="flex text-amber-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="text-slate-700 text-sm leading-relaxed mb-6" data-i18n="test.3.text">"Le dossier médical numérique a transformé le suivi de mes patientes enceintes. Tout est à jour, fiable et accessible en un clic."</p>
+        <div class="flex items-center gap-3">
+          <img class="w-11 h-11 rounded-full object-cover" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Dr." />
+          <div><p class="font-bold text-primary-950 text-sm">Dr. Leila T.</p><p class="text-xs text-slate-500" data-i18n="test.3.role">Gynécologue, Sousse</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== APPEL À L'ACTION ===================== -->
+<section id="contact" class="py-20 hero-gradient relative overflow-hidden text-white">
+  <div class="absolute inset-0 opacity-10" style="background-image:url('https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=1170&auto=format&fit=crop');background-size:cover;background-position:center;"></div>
+  <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-teal-400/20 blur-3xl"></div>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+    <span class="inline-block bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-medium text-teal-200 mb-6" data-i18n="cta.badge">Prêt à moderniser votre cabinet ?</span>
+    <h2 class="font-jakarta text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-6" data-i18n="cta.title">Passez au numérique dès aujourd'hui</h2>
+    <p class="text-lg text-primary-100/90 max-w-2xl mx-auto mb-10" data-i18n="cta.subtitle">Contactez-nous pour une démonstration personnalisée et une offre adaptée à votre cabinet. Installation accompagnée et formation incluse.</p>
+
+    <div class="grid sm:grid-cols-3 gap-5 max-w-3xl mx-auto mb-12">
+      <a href="https://wa.me/21696584737" data-wa target="_blank" class="group bg-white/10 backdrop-blur border border-white/25 rounded-2xl p-6 hover:bg-teal-400 hover:text-primary-950 transition shadow-lg">
+        <div class="text-3xl mb-3 text-teal-300 group-hover:text-primary-900"><i class="fa-brands fa-whatsapp"></i></div>
+        <p class="font-bold" data-i18n="cta.whatsapp">WhatsApp</p>
+        <p class="text-sm text-primary-100/90 mt-1"><bdi dir="ltr">+216 96 584 737</bdi></p>
+      </a>
+      <a href="tel:+21696584737" class="group bg-white/10 backdrop-blur border border-white/25 rounded-2xl p-6 hover:bg-teal-400 hover:text-primary-950 transition shadow-lg">
+        <div class="text-3xl mb-3 text-teal-300 group-hover:text-primary-900"><i class="fa-solid fa-phone"></i></div>
+        <p class="font-bold" data-i18n="cta.phone">Téléphone</p>
+        <p class="text-sm text-primary-100/90 mt-1"><bdi dir="ltr">+216 96 584 737</bdi></p>
+      </a>
+      <a href="mailto:dabbekchakib@gmail.com" class="group bg-white/10 backdrop-blur border border-white/25 rounded-2xl p-6 hover:bg-teal-400 hover:text-primary-950 transition shadow-lg">
+        <div class="text-3xl mb-3 text-teal-300 group-hover:text-primary-900"><i class="fa-solid fa-envelope"></i></div>
+        <p class="font-bold" data-i18n="cta.email">Email</p>
+        <p class="text-sm text-primary-100/90 mt-1"><bdi dir="ltr">dabbekchakib@gmail.com</bdi></p>
+      </a>
+    </div>
+
+    <p class="text-primary-100/80 text-sm mb-8" data-i18n-html="cta.contact">Contact : <strong class="text-white">CHAKIB DABBEK</strong></p>
+    <a href="https://wa.me/21696584737" data-wa target="_blank" class="inline-flex items-center gap-2 bg-teal-400 text-primary-950 font-bold px-9 py-4 rounded-full text-lg hover:bg-teal-300 transition shadow-2xl badge-glow">
+      <i class="fa-brands fa-whatsapp text-xl"></i> <span data-i18n="cta.btn">Réserver une démo gratuite</span>
+    </a>
+  </div>
+  <svg class="wave-divider w-full -bottom-px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" fill="#ffffff"><path d="M0,70 C240,20 480,100 720,80 C960,60 1200,10 1440,50 L1440,100 L0,100 Z"></path></svg>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="bg-white pb-4">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6 border-b border-slate-100 pb-8">
+      <a href="#" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl hero-gradient flex items-center justify-center text-white font-bold">D</div>
+        <span class="font-jakarta text-lg font-extrabold text-primary-900">DOCTA</span>
+      </a>
+      <p class="text-sm text-slate-500 text-center" data-i18n-html="foot.copyright">© <bdi dir="ltr">2026</bdi> DOCTA — L'ERP médical pour les médecins tunisiens. Tous droits réservés.</p>
+      <div class="flex gap-3 text-slate-400">
+        <a href="https://wa.me/21696584737" data-wa target="_blank" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-teal-500 hover:text-white hover:border-teal-500 transition"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="mailto:dabbekchakib@gmail.com" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-primary-600 hover:text-white hover:border-primary-600 transition"><i class="fa-solid fa-envelope"></i></a>
+        <a href="tel:+21696584737" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-primary-600 hover:text-white hover:border-primary-600 transition"><i class="fa-solid fa-phone"></i></a>
+      </div>
+    </div>
+    <p class="text-center text-xs text-slate-400 py-6" data-i18n-html="foot.center">CHAKIB DABBEK · +216 96 584 737 · dabbekchakib@gmail.com · Tunisie</p>
+  </div>
+</footer>
+
+<!-- ===================== TRADUCTIONS & SÉLECTEUR DE LANGUE ===================== -->
+<script>
+const I18N = {
+  fr: {
+    "meta.title": "DOCTA - Logiciel de Gestion Médicale pour Médecins Tunisiens",
+    "meta.desc": "DOCTA, l'ERP médical intelligent pour les médecins tunisiens. Gestion des patients, rendez-vous, dossiers médicaux, ordonnances et facturation.",
+    "wa.message": "Bonjour, je souhaite en savoir plus sur DOCTA, le logiciel de gestion médicale pour mon cabinet.",
+    "nav.features": "Fonctionnalités",
+    "nav.modules": "Modules",
+    "nav.benefits": "Avantages",
+    "nav.security": "Sécurité",
+    "nav.contact": "Contact",
+    "nav.cta": "Démarrer maintenant",
+    "hero.badge": "L'ERP médical de référence en Tunisie",
+    "hero.title1": "Gérez votre cabinet",
+    "hero.title2": "sans stress",
+    "hero.title3": ", soignez avec excellence",
+    "hero.subtitle": "DOCTA est la plateforme complète qui centralise vos patients, rendez-vous, dossiers médicaux, ordonnances et facturation dans un seul outil simple, rapide et sécurisé — conçu pour les médecins tunisiens.",
+    "hero.demo": "Demander une démo",
+    "hero.discover": "Découvrir",
+    "hero.trust": "<strong class=\"text-white font-bold\"><bdi dir=\"ltr\">+50</bdi></strong> médecins et cabinets<br />font déjà confiance",
+    "widget.earning": "Encaissé ce mois-ci",
+    "widget.attendance": "Rendez-vous honorés",
+    "stats.1": "de temps administratif économisé",
+    "stats.2": "accès à vos dossiers, partout",
+    "stats.3": "données chiffrées et protégées",
+    "stats.4": "médecins partenaires en Tunisie",
+    "features.badge": "Fonctionnalités",
+    "features.title1": "Tout votre cabinet,",
+    "features.title2": "un seul logiciel",
+    "features.subtitle": "DOCTA réunit l'ensemble de vos outils quotidiens dans une plateforme intuitive pensée pour les médecins et leurs secrétaires.",
+    "feat.1.t": "Fiches patients complètes",
+    "feat.1.d": "Numéro patient automatique (PAT-000001), CIN, cnam, assurance, photos, urgences, historique médical complet — tout à portée de main en un clic.",
+    "feat.2.t": "Agenda intelligent",
+    "feat.2.d": "Planifiez vos rendez-vous, confirmez automatiquement par notification, détectez les absents et optimisez chaque créneau de votre journée.",
+    "feat.3.t": "Dossier médical numérique",
+    "feat.3.d": "Antécédents, allergies, maladies chroniques, vaccinations et documents. Un suivi patient fiable et instantané, à vie.",
+    "feat.4.t": "Consultations structurées",
+    "feat.4.d": "Diagnostics, constantes (poids, tension, pouls), observations et notes — consignés proprement et liés automatiquement au dossier du patient.",
+    "feat.5.t": "Ordonnances PDF + QR Code",
+    "feat.5.d": "Générez des ordonnances professionnelles en PDF avec QR Code, imprimables et partageables en quelques secondes.",
+    "feat.6.t": "Facturation & encaissement",
+    "feat.6.d": "Factures, reçus PDF, paiements espèces, carte, chèque, cnam et assurance. Statistiques de chiffre d'affaires en temps réel.",
+    "feat.7.t": "Rapports & tableaux de bord",
+    "feat.7.d": "Suivez vos consultations mensuelles, votre chiffre d'affaires et vos paiements grâce à des statistiques claires et lisibles.",
+    "feat.8.t": "Notifications automatiques",
+    "feat.8.d": "Nouveau rendez-vous, confirmation, rappel de consultation, paiement reçu : plus aucun oubli, plus aucune relance manuelle.",
+    "feat.9.t": "Sécurité & conformité",
+    "feat.9.d": "Journal d'activité complet, gestion fine des rôles (médecin, secrétaire, comptable), protections de vos données médicales sensibles.",
+    "modules.badge": "Modules intégrés",
+    "modules.title1": "Une plateforme pensée pour",
+    "modules.title2": "chaque spécialité",
+    "modules.subtitle": "Adapté à tous les cabinets et polycliniques tunisiens — médecine générale, cardiologie, dermatologie, pédiatrie, gynécologie, orthopédie, dentaire et bien plus.",
+    "modules.1": "<strong class=\"text-primary-950\">Patients &amp; fiche médicale</strong> — dossiers structurés et recherche globale instantanée.",
+    "modules.2": "<strong class=\"text-primary-950\">Rendez-vous &amp; agenda</strong> — planification visuelle, statuts et notifications.",
+    "modules.3": "<strong class=\"text-primary-950\">Consultations &amp; dossiers</strong> — diagnostics et historique médical liés.",
+    "modules.4": "<strong class=\"text-primary-950\">Ordonnances PDF &amp; impression</strong> — avec QR Code sécurisé.",
+    "modules.5": "<strong class=\"text-primary-950\">Facturation &amp; paiements</strong> — cnam, assurance, espèces, carte, chèque.",
+    "modules.6": "<strong class=\"text-primary-950\">Rapports &amp; statistiques</strong> — pilotage financier et d'activité.",
+    "widget.patients": "Patients aujourd'hui",
+    "spec.badge": "Adapté à votre spécialité",
+    "spec.title1": "Parfait pour",
+    "spec.title2": "tous les cabinets",
+    "spec.1": "Généraliste",
+    "spec.2": "Cardiologue",
+    "spec.3": "Pédiatre",
+    "spec.4": "Dermatologue",
+    "spec.5": "Gynécologue",
+    "spec.6": "Orthopédiste",
+    "spec.7": "Dentiste",
+    "spec.8": "Neurologue",
+    "spec.9": "Ophtalmologue",
+    "spec.10": "ORL",
+    "spec.11": "Pneumologue",
+    "spec.12": "Laboratoire",
+    "adv.badge": "Pourquoi DOCTA ?",
+    "adv.title1": "Passez plus de temps à soigner,",
+    "adv.title2": "moins à gérer",
+    "adv.1.t": "Gain de temps immédiat",
+    "adv.1.d": "Fiches patients pré-remplies, ordonnances en 10 secondes, factures générées automatiquement : récupérez des heures chaque semaine.",
+    "adv.2.t": "Accessible partout",
+    "adv.2.d": "PC, tablette ou téléphone : consultez vos dossiers à la clinique, à la maison ou en déplacement, même sans connexion.",
+    "adv.3.t": "Équipe simplifiée",
+    "adv.3.d": "Votre secrétaire gère l'agenda, les patients et l'encaissement. Votre comptable suit les comptes. Vous, vous soignez.",
+    "adv.4.t": "Rentabilité maîtrisée",
+    "adv.4.d": "Zero papier perdu, encaissements maîtrisés, tableau de bord financier clair pour prendre les meilleures décisions.",
+    "advstat.1": "pour créer un dossier patient",
+    "advstat.2": "pour générer une ordonnance",
+    "advstat.3.v": "0 papier",
+    "advstat.3.c": "dossiers 100% numériques",
+    "advstat.4.v": "Sauvegarde",
+    "advstat.4.c": "auto & sécurisée de vos données",
+    "secu.badge": "Sécurité & confidentialité",
+    "secu.title1": "Vos données médicales sont",
+    "secu.title2": "sacrées",
+    "secu.1.t": "Chiffrement fort",
+    "secu.1.d": "Vos données sont chiffrées et stockées sur des serveurs sécurisés en Europe et en Tunisie.",
+    "secu.2.t": "Rôles & permissions",
+    "secu.2.d": "Chaque membre de l'équipe n'accède qu'à ce dont il a besoin. Journal d'activité complet.",
+    "secu.3.t": "Sauvegardes automatiques",
+    "secu.3.d": "Sauvegardes quotidiennes automatiques : en cas d'incident, vos données restent intactes.",
+    "testim.badge": "Témoignages",
+    "testim.title1": "Ils utilisent DOCTA au",
+    "testim.title2": "quotidien",
+    "test.1.text": "\"Depuis DOCTA, ma secrétaire gère tout l'agenda et les encaissements. J'ai récupéré un temps précieux et ma patientèle est mieux suivie.\"",
+    "test.1.role": "Médecin généraliste, Tunis",
+    "test.2.text": "\"Les ordonnances PDF avec QR Code et la facturation cnam m'ont fait gagner énormément de temps. Le support est très réactif.\"",
+    "test.2.role": "Cardiologue, Sfax",
+    "test.3.text": "\"Le dossier médical numérique a transformé le suivi de mes patientes enceintes. Tout est à jour, fiable et accessible en un clic.\"",
+    "test.3.role": "Gynécologue, Sousse",
+    "cta.badge": "Prêt à moderniser votre cabinet ?",
+    "cta.title": "Passez au numérique dès aujourd'hui",
+    "cta.subtitle": "Contactez-nous pour une démonstration personnalisée et une offre adaptée à votre cabinet. Installation accompagnée et formation incluse.",
+    "cta.whatsapp": "WhatsApp",
+    "cta.phone": "Téléphone",
+    "cta.email": "Email",
+    "cta.contact": "Contact : <strong class=\"text-white\">CHAKIB DABBEK</strong>",
+    "cta.btn": "Réserver une démo gratuite",
+    "foot.copyright": "© <bdi dir=\"ltr\">2026</bdi> DOCTA — L'ERP médical pour les médecins tunisiens. Tous droits réservés.",
+    "foot.center": "CHAKIB DABBEK · <bdi dir=\"ltr\">+216 96 584 737</bdi> · <bdi dir=\"ltr\">dabbekchakib@gmail.com</bdi> · Tunisie"
+  },
+  ar: {
+    "meta.title": "DOCTA - برنامج إدارة العيادات الطبية للأطباء في تونس",
+    "meta.desc": "DOCTA هو نظام إدارة الممارسات الطبية الذكي للأطباء التونسيين. إدارة المرضى والمواعيد والملفات الطبية والوصفات الطبية والفوترة.",
+    "wa.message": "مرحباً، أود معرفة المزيد عن DOCTA برنامج إدارة العيادة الطبية.",
+    "nav.features": "الميزات",
+    "nav.modules": "الوحدات",
+    "nav.benefits": "المزايا",
+    "nav.security": "الأمان",
+    "nav.contact": "اتصل بنا",
+    "nav.cta": "ابدأ الآن",
+    "hero.badge": "نظام إدارة الممارسات الطبية الرائد في تونس",
+    "hero.title1": "أدر عيادتك",
+    "hero.title2": "دون ضغوط",
+    "hero.title3": "، وامنح رعاية استثنائية",
+    "hero.subtitle": "DOCTA هي المنصة المتكاملة التي تجمع مرضاك ومواعيدك وملفاتك الطبية ووصفاتك وفوترة عيادتك في أداة واحدة بسيطة وسريعة وآمنة — مصممة خصيصاً للأطباء التونسيين.",
+    "hero.demo": "اطلب عرضاً توضيحياً",
+    "hero.discover": "اكتشف المزيد",
+    "hero.trust": "<strong class=\"text-white font-bold\"><bdi dir=\"ltr\">+50</bdi></strong> طبيباً وعيادة<br />يثقون بنا بالفعل",
+    "widget.earning": "تم تحصيله هذا الشهر",
+    "widget.attendance": "مواعيد مؤكدة",
+    "stats.1": "من الوقت الإداري الموفر",
+    "stats.2": "وصول إلى ملفاتك من أي مكان",
+    "stats.3": "بياناتك مشفرة ومحمية",
+    "stats.4": "طبيباً شريكاً في تونس",
+    "features.badge": "الميزات",
+    "features.title1": "عيادتك كاملة،",
+    "features.title2": "ببرنامج واحد",
+    "features.subtitle": "يجمع DOCTA جميع أدواتك اليومية في منصة بديهية مصممة للأطباء ومساعديهم.",
+    "feat.1.t": "ملفات مرضى متكاملة",
+    "feat.1.d": "رقم مريض تلقائي (PAT-000001)، بطاقة التعريف، الـ cnam، التأمين، الصور، حالات الطوارئ، والتاريخ الطبي الكامل — كل ذلك بضغطة زر.",
+    "feat.2.t": "جدول مواعيد ذكي",
+    "feat.2.d": "نظّم مواعيدك، وأكّدها تلقائياً عبر الإشعارات، واكتشف المتغيبين وحسّن كل فتحة من يومك.",
+    "feat.3.t": "ملف طبي رقمي",
+    "feat.3.d": "التاريخ المرضي، الحساسية، الأمراض المزمنة، التلقيحات والوثائق. متابعة موثوقة وفورية للمريض مدى الحياة.",
+    "feat.4.t": "فحوصات منظمة",
+    "feat.4.d": "التشخيصات، العلامات الحيوية (الوزن، ضغط الدم، النبض)، الملاحظات — مسجّلة بدقة ومرتبطة تلقائياً بملف المريض.",
+    "feat.5.t": "وصفات PDF + رمز QR",
+    "feat.5.d": "أنشئ وصفات احترافية بصيغة PDF مع رمز QR، قابلة للطباعة والمشاركة في ثوانٍ.",
+    "feat.6.t": "الفوترة والتحصيل",
+    "feat.6.d": "فواتير، وإيصالات PDF، ودفع نقداً، وبطاقة، وشيكاً، وعبر الـ cnam والتأمين. إحصائيات رقم المعاملات في الوقت الفعلي.",
+    "feat.7.t": "تقارير ولوحات قيادة",
+    "feat.7.d": "تابع استشاراتك الشهرية، رقم معاملاتك ومدفوعاتك عبر إحصائيات واضحة وقابلة للقراءة.",
+    "feat.8.t": "إشعارات تلقائية",
+    "feat.8.d": "موعد جديد، تأكيد، تذكير بالاستشارة، استلام الدفع: لا مزيد من النسيان ولا مزيد من التذكير اليدوي.",
+    "feat.9.t": "الأمان والامتثال",
+    "feat.9.d": "سجل نشاط كامل، إدارة أدق للأدوار (طبيب، سكرتير، محاسب)، وحماية بياناتك الطبية الحساسة.",
+    "modules.badge": "الوحدات المدمجة",
+    "modules.title1": "منصة مصممة",
+    "modules.title2": "لكل تخصص",
+    "modules.subtitle": "مناسبة لكل العيادات والمجمعات الطبية التونسية — الطب العام، أمراض القلب، الجلدية، الأطفال، النساء والتوليد، العظام، طب الأسنان والمزيد.",
+    "modules.1": "<strong class=\"text-primary-950\">المرضى والملف الطبي</strong> — ملفات منظمة وبحث فوري وشامل.",
+    "modules.2": "<strong class=\"text-primary-950\">المواعيد والجدول</strong> — تخطيط مرئي وحالات وإشعارات.",
+    "modules.3": "<strong class=\"text-primary-950\">الفحوصات والملفات</strong> — تشخيصات وتاريخ طبي مرتبط.",
+    "modules.4": "<strong class=\"text-primary-950\">وصفات PDF والطباعة</strong> — مع رمز QR آمن.",
+    "modules.5": "<strong class=\"text-primary-950\">الفوترة والمدفوعات</strong> — cnam، تأمين، نقداً، بطاقة، شيك.",
+    "modules.6": "<strong class=\"text-primary-950\">التقارير والإحصائيات</strong> — إدارة مالية ونشاط.",
+    "widget.patients": "المرضى اليوم",
+    "spec.badge": "مخصص لتخصصك",
+    "spec.title1": "مثالي",
+    "spec.title2": "لكل العيادات",
+    "spec.1": "طبيب عام",
+    "spec.2": "طبيب قلب",
+    "spec.3": "طبيب أطفال",
+    "spec.4": "طبيب جلدية",
+    "spec.5": "طبيب نساء",
+    "spec.6": "طبيب عظام",
+    "spec.7": "طبيب أسنان",
+    "spec.8": "طبيب أعصاب",
+    "spec.9": "طبيب عيون",
+    "spec.10": "أنف أذن حنجرة",
+    "spec.11": "طبيب رئة",
+    "spec.12": "مخبر",
+    "adv.badge": "لماذا DOCTA؟",
+    "adv.title1": "قدّم وقتاً أطول للعلاج،",
+    "adv.title2": "ووقتاً أقل للإدارة",
+    "adv.1.t": "توفير فوري للوقت",
+    "adv.1.d": "ملفات مرضى معبأة مسبقاً، وصفات في 10 ثوانٍ، فواتير تُنشأ تلقائياً: وفر ساعات كل أسبوع.",
+    "adv.2.t": "متاح في كل مكان",
+    "adv.2.d": "حاسوب، جهاز لوحي أو هاتف: اطلع على ملفاتك في العيادة أو المنزل أو أثناء التنقل، حتى بدون اتصال.",
+    "adv.3.t": "فريق مبسط",
+    "adv.3.d": "سكرتيرتك تدير الجدول والمرضى والتحصيل. محاسبك يتابع الحسابات. وأنت تعالج.",
+    "adv.4.t": "ربحية محكمة",
+    "adv.4.d": "لا ورق ضائع، تحصيلات مضبوطة، ولوحة مالية واضحة لاتخاذ أفضل القرارات.",
+    "advstat.1": "لإنشاء ملف مريض",
+    "advstat.2": "لإنشاء وصفة طبية",
+    "advstat.3.v": "صفر ورقة",
+    "advstat.3.c": "ملفات رقمية 100%",
+    "advstat.4.v": "نسخة احتياطية",
+    "advstat.4.c": "تلقائية وآمنة لبياناتك",
+    "secu.badge": "الأمان والسرية",
+    "secu.title1": "بياناتك الطبية",
+    "secu.title2": "مقدسة",
+    "secu.1.t": "تشفير قوي",
+    "secu.1.d": "بياناتك مشفرة ومخزنة على خوادم آمنة في أوروبا وتونس.",
+    "secu.2.t": "أدوار وصلاحيات",
+    "secu.2.d": "كل عضو في الفريق يصل فقط إلى ما يحتاجه. سجل نشاط كامل.",
+    "secu.3.t": "نسخ احتياطي تلقائي",
+    "secu.3.d": "نسخ احتياطي يومي تلقائي: في حال حدوث أي طارئ، تبقى بياناتك سليمة.",
+    "testim.badge": "آراء الأطباء",
+    "testim.title1": "يستخدمون DOCTA",
+    "testim.title2": "يومياً",
+    "test.1.text": "\"منذ اعتماد DOCTA، تسهر سكرتيرتي على الجدول والتحصيل. استعدت وقتاً ثميناً وأصبحت متابعة مرضاي أفضل.\"",
+    "test.1.role": "طبيبة عامة، تونس",
+    "test.2.text": "\"الوصفات بصيغة PDF مع رمز QR والفوترة عبر الـ cnam وفّرت لي وقتاً هائلاً. والدعم سريع جداً.\"",
+    "test.2.role": "طبيب قلب، صفاقس",
+    "test.3.text": "\"الملف الطبي الرقمي غيّر متابعة المريضات الحوامل. كل شيء محدّث وموثوق ويمكن الوصول إليه بضغطة واحدة.\"",
+    "test.3.role": "طبيبة نساء، سوسة",
+    "cta.badge": "جاهز لتحديث عيادتك؟",
+    "cta.title": "انتقل إلى الرقمنة اليوم",
+    "cta.subtitle": "اتصل بنا للحصول على عرض توضيحي مخصص وعرض يناسب عيادتك. التركيب مصحوب والتدريب مشمول.",
+    "cta.whatsapp": "واتساب",
+    "cta.phone": "هاتف",
+    "cta.email": "البريد الإلكتروني",
+    "cta.contact": "الاتصال: <strong class=\"text-white\">شكيب دبّك</strong>",
+    "cta.btn": "احجز عرضاً تجريبياً مجانياً",
+    "foot.copyright": "© <bdi dir=\"ltr\">2026</bdi> DOCTA — نظام إدارة الممارسات الطبية للأطباء التونسيين. جميع الحقوق محفوظة.",
+    "foot.center": "شكيب الدّباك · <bdi dir=\"ltr\">+216 96 584 737</bdi> · <bdi dir=\"ltr\">dabbekchakib@gmail.com</bdi> · تونس"
+  },
+  en: {
+    "meta.title": "DOCTA - Medical Practice Management Software for Tunisian Doctors",
+    "meta.desc": "DOCTA, the smart medical ERP for Tunisian doctors. Manage patients, appointments, medical records, prescriptions and billing.",
+    "wa.message": "Hello, I'd like to learn more about DOCTA, the medical practice management software for my clinic.",
+    "nav.features": "Features",
+    "nav.modules": "Modules",
+    "nav.benefits": "Benefits",
+    "nav.security": "Security",
+    "nav.contact": "Contact",
+    "nav.cta": "Start now",
+    "hero.badge": "Tunisia's leading medical practice platform",
+    "hero.title1": "Run your practice",
+    "hero.title2": "without stress",
+    "hero.title3": ", deliver excellent care",
+    "hero.subtitle": "DOCTA is the complete platform that centralizes your patients, appointments, medical records, prescriptions and billing in one simple, fast and secure tool — designed for Tunisian doctors.",
+    "hero.demo": "Book a demo",
+    "hero.discover": "Discover",
+    "hero.trust": "<strong class=\"text-white font-bold\"><bdi dir=\"ltr\">+50</bdi></strong> doctors and practices<br />already trust us",
+    "widget.earning": "Collected this month",
+    "widget.attendance": "Appointments honored",
+    "stats.1": "of administrative time saved",
+    "stats.2": "access to your records, anywhere",
+    "stats.3": "encrypted & protected data",
+    "stats.4": "partner doctors in Tunisia",
+    "features.badge": "Features",
+    "features.title1": "Your entire practice,",
+    "features.title2": "one software",
+    "features.subtitle": "DOCTA brings together all your daily tools in an intuitive platform built for doctors and their secretaries.",
+    "feat.1.t": "Complete patient records",
+    "feat.1.d": "Automatic patient number (PAT-000001), ID card, cnam, insurance, photos, emergencies, complete medical history — everything at your fingertips.",
+    "feat.2.t": "Smart scheduling",
+    "feat.2.d": "Plan your appointments, confirm them automatically by notification, detect no-shows and optimize every slot of your day.",
+    "feat.3.t": "Digital medical record",
+    "feat.3.d": "History, allergies, chronic diseases, vaccinations and documents. Reliable, instant lifetime patient follow-up.",
+    "feat.4.t": "Structured consultations",
+    "feat.4.d": "Diagnoses, vitals (weight, blood pressure, pulse), observations and notes — neatly recorded and automatically linked to the patient record.",
+    "feat.5.t": "PDF prescriptions + QR Code",
+    "feat.5.d": "Generate professional PDF prescriptions with a QR Code, printable and shareable in seconds.",
+    "feat.6.t": "Billing & payments",
+    "feat.6.d": "Invoices, PDF receipts, cash, card, check, cnam and insurance payments. Real-time revenue statistics.",
+    "feat.7.t": "Reports & dashboards",
+    "feat.7.d": "Track your monthly consultations, revenue and payments through clear, readable statistics.",
+    "feat.8.t": "Automatic notifications",
+    "feat.8.d": "New appointment, confirmation, consultation reminder, payment received: no more missed items, no more manual follow-up.",
+    "feat.9.t": "Security & compliance",
+    "feat.9.d": "Complete activity log, fine-grained role management (doctor, secretary, accountant), protection of your sensitive medical data.",
+    "modules.badge": "Built-in modules",
+    "modules.title1": "A platform designed for",
+    "modules.title2": "every specialty",
+    "modules.subtitle": "Built for all Tunisian practices and clinics — general practice, cardiology, dermatology, pediatrics, gynecology, orthopedics, dental and more.",
+    "modules.1": "<strong class=\"text-primary-950\">Patients &amp; medical record</strong> — structured records and instant global search.",
+    "modules.2": "<strong class=\"text-primary-950\">Appointments &amp; schedule</strong> — visual planning, statuses and notifications.",
+    "modules.3": "<strong class=\"text-primary-950\">Consultations &amp; records</strong> — linked diagnoses and medical history.",
+    "modules.4": "<strong class=\"text-primary-950\">PDF prescriptions &amp; printing</strong> — with secure QR Code.",
+    "modules.5": "<strong class=\"text-primary-950\">Billing &amp; payments</strong> — cnam, insurance, cash, card, check.",
+    "modules.6": "<strong class=\"text-primary-950\">Reports &amp; statistics</strong> — financial and activity management.",
+    "widget.patients": "Patients today",
+    "spec.badge": "Built for your specialty",
+    "spec.title1": "Perfect for",
+    "spec.title2": "every practice",
+    "spec.1": "General practitioner",
+    "spec.2": "Cardiologist",
+    "spec.3": "Pediatrician",
+    "spec.4": "Dermatologist",
+    "spec.5": "Gynecologist",
+    "spec.6": "Orthopedic surgeon",
+    "spec.7": "Dentist",
+    "spec.8": "Neurologist",
+    "spec.9": "Ophthalmologist",
+    "spec.10": "ENT",
+    "spec.11": "Pulmonologist",
+    "spec.12": "Laboratory",
+    "adv.badge": "Why DOCTA?",
+    "adv.title1": "Spend more time caring,",
+    "adv.title2": "less time managing",
+    "adv.1.t": "Instant time savings",
+    "adv.1.d": "Pre-filled patient records, prescriptions in 10 seconds, automatically generated invoices: win back hours every week.",
+    "adv.2.t": "Accessible everywhere",
+    "adv.2.d": "PC, tablet or phone: access your records at the clinic, at home or on the go, even offline.",
+    "adv.3.t": "A simplified team",
+    "adv.3.d": "Your secretary manages the schedule, patients and cash collection. Your accountant tracks the accounts. You care.",
+    "adv.4.t": "Controlled profitability",
+    "adv.4.d": "No lost paperwork, controlled collections, a clear financial dashboard to make the best decisions.",
+    "advstat.1": "to create a patient record",
+    "advstat.2": "to generate a prescription",
+    "advstat.3.v": "0 paper",
+    "advstat.3.c": "100% digital records",
+    "advstat.4.v": "Backup",
+    "advstat.4.c": "automatic & secure for your data",
+    "secu.badge": "Security & confidentiality",
+    "secu.title1": "Your medical data is",
+    "secu.title2": "sacred",
+    "secu.1.t": "Strong encryption",
+    "secu.1.d": "Your data is encrypted and stored on secure servers in Europe and Tunisia.",
+    "secu.2.t": "Roles & permissions",
+    "secu.2.d": "Each team member only accesses what they need. Complete activity log.",
+    "secu.3.t": "Automatic backups",
+    "secu.3.d": "Daily automatic backups: in the event of an incident, your data remains intact.",
+    "testim.badge": "Testimonials",
+    "testim.title1": "They use DOCTA",
+    "testim.title2": "every day",
+    "test.1.text": "\"Since DOCTA, my secretary handles the whole schedule and cash collection. I've won back precious time and my patients are better followed up.\"",
+    "test.1.role": "General practitioner, Tunis",
+    "test.2.text": "\"The PDF prescriptions with QR Code and cnam billing saved me a huge amount of time. The support is very responsive.\"",
+    "test.2.role": "Cardiologist, Sfax",
+    "test.3.text": "\"The digital medical record transformed follow-up of my pregnant patients. Everything is up to date, reliable and one click away.\"",
+    "test.3.role": "Gynecologist, Sousse",
+    "cta.badge": "Ready to modernize your practice?",
+    "cta.title": "Go digital today",
+    "cta.subtitle": "Contact us for a personalized demo and an offer tailored to your practice. Guided installation and training included.",
+    "cta.whatsapp": "WhatsApp",
+    "cta.phone": "Phone",
+    "cta.email": "Email",
+    "cta.contact": "Contact: <strong class=\"text-white\">CHAKIB DABBEK</strong>",
+    "cta.btn": "Book a free demo",
+    "foot.copyright": "© <bdi dir=\"ltr\">2026</bdi> DOCTA — The medical ERP for Tunisian doctors. All rights reserved.",
+    "foot.center": "CHAKIB DABBEK · <bdi dir=\"ltr\">+216 96 584 737</bdi> · <bdi dir=\"ltr\">dabbekchakib@gmail.com</bdi> · Tunisia"
+  }
+};
+
+const LANG_CODES = {
+  fr: 'FR',
+  ar: 'AR',
+  en: 'EN'
+};
+
+function applyLanguage(lang) {
+  const dict = I18N[lang] || I18N.fr;
+
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  document.title = dict['meta.title'] || document.title;
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.setAttribute('content', dict['meta.desc'] || '');
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.textContent = dict[key];
+  });
+
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+
+  document.querySelectorAll('[data-wa]').forEach(el => {
+    const msg = dict['wa.message'] || I18N.fr['wa.message'];
+    el.setAttribute('href', 'https://wa.me/21696584737?text=' + encodeURIComponent(msg));
+  });
+
+  const btnLabel = document.getElementById('langBtnLabel');
+  if (btnLabel) btnLabel.textContent = LANG_CODES[lang] || lang.toUpperCase();
+
+  localStorage.setItem('docta-lang', lang);
+}
+
+/* ---- Sélecteur de langue ---- */
+const langBtn = document.getElementById('langBtn');
+const langMenu = document.getElementById('langMenu');
+const langSwitcher = document.getElementById('langSwitcher');
+
+langBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  langMenu.classList.toggle('hidden');
+});
+
+document.querySelectorAll('.lang-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    applyLanguage(opt.getAttribute('data-lang'));
+    langMenu.classList.add('hidden');
+  });
+});
+
+document.addEventListener('click', (e) => {
+  if (!langSwitcher.contains(e.target)) langMenu.classList.add('hidden');
+});
+
+/* ---- Scroll reveal ---- */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ---- Initialisation ---- */
+applyLanguage(localStorage.getItem('docta-lang') || 'fr');
+</script>
+</body>
+</html>
