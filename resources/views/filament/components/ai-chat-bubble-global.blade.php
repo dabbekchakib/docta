@@ -1,1 +1,1 @@
-@livewire('ai-chat-bubble')
+@livewire('AIChatBubble')
